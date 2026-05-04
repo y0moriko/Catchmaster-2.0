@@ -90,6 +90,15 @@ const workflowCards = [
     steps: ["Click 'Register New Fisherman'", "Fill in name & barangay", "Submit to add to registry"]
   },
   {
+    id: "fish-directory",
+    title: "Browse Fish Directory",
+    description: "Explore fish species from Tayabas Bay with detailed information and filters.",
+    icon: Fish,
+    path: "/demo/fish-directory",
+    color: "from-teal-500 to-cyan-600",
+    steps: ["View fish species cards", "Use filters by family/habitat", "Search by name or scientific name"]
+  },
+  {
     id: "catch",
     title: "Log Catch",
     description: "Record daily fish landings with species, weight, and location data.",
@@ -282,6 +291,7 @@ export function DemoSidebar({ currentPath }: { currentPath: string }) {
   const items = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/demo/dashboard", id: "nav-dashboard", description: "View stats & trends" },
     { name: "Fishermen", icon: Users, path: "/demo/fishermen", id: "nav-fishermen", description: "Manage registry" },
+    { name: "Fish Directory", icon: Fish, path: "/demo/fish-directory", id: "nav-fish-directory", description: "Browse species" },
     { name: "Log Catch", icon: Fish, path: "/demo/catches", id: "nav-catches", description: "Record landings" },
     { name: "Reports", icon: BarChart3, path: "/demo/reports", id: "nav-reports", description: "Analytics & export" },
   ];

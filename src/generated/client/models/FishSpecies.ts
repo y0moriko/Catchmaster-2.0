@@ -20,8 +20,20 @@ export type FishSpeciesModel = runtime.Types.Result.DefaultSelection<Prisma.$Fis
 
 export type AggregateFishSpecies = {
   _count: FishSpeciesCountAggregateOutputType | null
+  _avg: FishSpeciesAvgAggregateOutputType | null
+  _sum: FishSpeciesSumAggregateOutputType | null
   _min: FishSpeciesMinAggregateOutputType | null
   _max: FishSpeciesMaxAggregateOutputType | null
+}
+
+export type FishSpeciesAvgAggregateOutputType = {
+  length: number | null
+  trophicLevel: number | null
+}
+
+export type FishSpeciesSumAggregateOutputType = {
+  length: number | null
+  trophicLevel: number | null
 }
 
 export type FishSpeciesMinAggregateOutputType = {
@@ -31,6 +43,11 @@ export type FishSpeciesMinAggregateOutputType = {
   scientificName: string | null
   category: string | null
   imageUrl: string | null
+  family: string | null
+  habitat: string | null
+  length: number | null
+  trophicLevel: number | null
+  status: string | null
 }
 
 export type FishSpeciesMaxAggregateOutputType = {
@@ -40,6 +57,11 @@ export type FishSpeciesMaxAggregateOutputType = {
   scientificName: string | null
   category: string | null
   imageUrl: string | null
+  family: string | null
+  habitat: string | null
+  length: number | null
+  trophicLevel: number | null
+  status: string | null
 }
 
 export type FishSpeciesCountAggregateOutputType = {
@@ -49,9 +71,24 @@ export type FishSpeciesCountAggregateOutputType = {
   scientificName: number
   category: number
   imageUrl: number
+  family: number
+  habitat: number
+  length: number
+  trophicLevel: number
+  status: number
   _all: number
 }
 
+
+export type FishSpeciesAvgAggregateInputType = {
+  length?: true
+  trophicLevel?: true
+}
+
+export type FishSpeciesSumAggregateInputType = {
+  length?: true
+  trophicLevel?: true
+}
 
 export type FishSpeciesMinAggregateInputType = {
   id?: true
@@ -60,6 +97,11 @@ export type FishSpeciesMinAggregateInputType = {
   scientificName?: true
   category?: true
   imageUrl?: true
+  family?: true
+  habitat?: true
+  length?: true
+  trophicLevel?: true
+  status?: true
 }
 
 export type FishSpeciesMaxAggregateInputType = {
@@ -69,6 +111,11 @@ export type FishSpeciesMaxAggregateInputType = {
   scientificName?: true
   category?: true
   imageUrl?: true
+  family?: true
+  habitat?: true
+  length?: true
+  trophicLevel?: true
+  status?: true
 }
 
 export type FishSpeciesCountAggregateInputType = {
@@ -78,6 +125,11 @@ export type FishSpeciesCountAggregateInputType = {
   scientificName?: true
   category?: true
   imageUrl?: true
+  family?: true
+  habitat?: true
+  length?: true
+  trophicLevel?: true
+  status?: true
   _all?: true
 }
 
@@ -119,6 +171,18 @@ export type FishSpeciesAggregateArgs<ExtArgs extends runtime.Types.Extensions.In
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: FishSpeciesAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: FishSpeciesSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: FishSpeciesMinAggregateInputType
@@ -149,6 +213,8 @@ export type FishSpeciesGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   _count?: FishSpeciesCountAggregateInputType | true
+  _avg?: FishSpeciesAvgAggregateInputType
+  _sum?: FishSpeciesSumAggregateInputType
   _min?: FishSpeciesMinAggregateInputType
   _max?: FishSpeciesMaxAggregateInputType
 }
@@ -160,7 +226,14 @@ export type FishSpeciesGroupByOutputType = {
   scientificName: string | null
   category: string | null
   imageUrl: string | null
+  family: string | null
+  habitat: string | null
+  length: number | null
+  trophicLevel: number | null
+  status: string | null
   _count: FishSpeciesCountAggregateOutputType | null
+  _avg: FishSpeciesAvgAggregateOutputType | null
+  _sum: FishSpeciesSumAggregateOutputType | null
   _min: FishSpeciesMinAggregateOutputType | null
   _max: FishSpeciesMaxAggregateOutputType | null
 }
@@ -190,6 +263,11 @@ export type FishSpeciesWhereInput = {
   scientificName?: Prisma.StringNullableFilter<"FishSpecies"> | string | null
   category?: Prisma.StringNullableFilter<"FishSpecies"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"FishSpecies"> | string | null
+  family?: Prisma.StringNullableFilter<"FishSpecies"> | string | null
+  habitat?: Prisma.StringNullableFilter<"FishSpecies"> | string | null
+  length?: Prisma.FloatNullableFilter<"FishSpecies"> | number | null
+  trophicLevel?: Prisma.FloatNullableFilter<"FishSpecies"> | number | null
+  status?: Prisma.StringNullableFilter<"FishSpecies"> | string | null
   catchDetails?: Prisma.CatchDetailListRelationFilter
 }
 
@@ -200,6 +278,11 @@ export type FishSpeciesOrderByWithRelationInput = {
   scientificName?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  family?: Prisma.SortOrderInput | Prisma.SortOrder
+  habitat?: Prisma.SortOrderInput | Prisma.SortOrder
+  length?: Prisma.SortOrderInput | Prisma.SortOrder
+  trophicLevel?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrderInput | Prisma.SortOrder
   catchDetails?: Prisma.CatchDetailOrderByRelationAggregateInput
 }
 
@@ -213,6 +296,11 @@ export type FishSpeciesWhereUniqueInput = Prisma.AtLeast<{
   scientificName?: Prisma.StringNullableFilter<"FishSpecies"> | string | null
   category?: Prisma.StringNullableFilter<"FishSpecies"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"FishSpecies"> | string | null
+  family?: Prisma.StringNullableFilter<"FishSpecies"> | string | null
+  habitat?: Prisma.StringNullableFilter<"FishSpecies"> | string | null
+  length?: Prisma.FloatNullableFilter<"FishSpecies"> | number | null
+  trophicLevel?: Prisma.FloatNullableFilter<"FishSpecies"> | number | null
+  status?: Prisma.StringNullableFilter<"FishSpecies"> | string | null
   catchDetails?: Prisma.CatchDetailListRelationFilter
 }, "id">
 
@@ -223,9 +311,16 @@ export type FishSpeciesOrderByWithAggregationInput = {
   scientificName?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  family?: Prisma.SortOrderInput | Prisma.SortOrder
+  habitat?: Prisma.SortOrderInput | Prisma.SortOrder
+  length?: Prisma.SortOrderInput | Prisma.SortOrder
+  trophicLevel?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.FishSpeciesCountOrderByAggregateInput
+  _avg?: Prisma.FishSpeciesAvgOrderByAggregateInput
   _max?: Prisma.FishSpeciesMaxOrderByAggregateInput
   _min?: Prisma.FishSpeciesMinOrderByAggregateInput
+  _sum?: Prisma.FishSpeciesSumOrderByAggregateInput
 }
 
 export type FishSpeciesScalarWhereWithAggregatesInput = {
@@ -238,6 +333,11 @@ export type FishSpeciesScalarWhereWithAggregatesInput = {
   scientificName?: Prisma.StringNullableWithAggregatesFilter<"FishSpecies"> | string | null
   category?: Prisma.StringNullableWithAggregatesFilter<"FishSpecies"> | string | null
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"FishSpecies"> | string | null
+  family?: Prisma.StringNullableWithAggregatesFilter<"FishSpecies"> | string | null
+  habitat?: Prisma.StringNullableWithAggregatesFilter<"FishSpecies"> | string | null
+  length?: Prisma.FloatNullableWithAggregatesFilter<"FishSpecies"> | number | null
+  trophicLevel?: Prisma.FloatNullableWithAggregatesFilter<"FishSpecies"> | number | null
+  status?: Prisma.StringNullableWithAggregatesFilter<"FishSpecies"> | string | null
 }
 
 export type FishSpeciesCreateInput = {
@@ -247,6 +347,11 @@ export type FishSpeciesCreateInput = {
   scientificName?: string | null
   category?: string | null
   imageUrl?: string | null
+  family?: string | null
+  habitat?: string | null
+  length?: number | null
+  trophicLevel?: number | null
+  status?: string | null
   catchDetails?: Prisma.CatchDetailCreateNestedManyWithoutFishInput
 }
 
@@ -257,6 +362,11 @@ export type FishSpeciesUncheckedCreateInput = {
   scientificName?: string | null
   category?: string | null
   imageUrl?: string | null
+  family?: string | null
+  habitat?: string | null
+  length?: number | null
+  trophicLevel?: number | null
+  status?: string | null
   catchDetails?: Prisma.CatchDetailUncheckedCreateNestedManyWithoutFishInput
 }
 
@@ -267,6 +377,11 @@ export type FishSpeciesUpdateInput = {
   scientificName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  family?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  habitat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  length?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  trophicLevel?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   catchDetails?: Prisma.CatchDetailUpdateManyWithoutFishNestedInput
 }
 
@@ -277,6 +392,11 @@ export type FishSpeciesUncheckedUpdateInput = {
   scientificName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  family?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  habitat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  length?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  trophicLevel?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   catchDetails?: Prisma.CatchDetailUncheckedUpdateManyWithoutFishNestedInput
 }
 
@@ -287,6 +407,11 @@ export type FishSpeciesCreateManyInput = {
   scientificName?: string | null
   category?: string | null
   imageUrl?: string | null
+  family?: string | null
+  habitat?: string | null
+  length?: number | null
+  trophicLevel?: number | null
+  status?: string | null
 }
 
 export type FishSpeciesUpdateManyMutationInput = {
@@ -296,6 +421,11 @@ export type FishSpeciesUpdateManyMutationInput = {
   scientificName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  family?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  habitat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  length?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  trophicLevel?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type FishSpeciesUncheckedUpdateManyInput = {
@@ -305,6 +435,11 @@ export type FishSpeciesUncheckedUpdateManyInput = {
   scientificName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  family?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  habitat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  length?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  trophicLevel?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type FishSpeciesCountOrderByAggregateInput = {
@@ -314,6 +449,16 @@ export type FishSpeciesCountOrderByAggregateInput = {
   scientificName?: Prisma.SortOrder
   category?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  family?: Prisma.SortOrder
+  habitat?: Prisma.SortOrder
+  length?: Prisma.SortOrder
+  trophicLevel?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+}
+
+export type FishSpeciesAvgOrderByAggregateInput = {
+  length?: Prisma.SortOrder
+  trophicLevel?: Prisma.SortOrder
 }
 
 export type FishSpeciesMaxOrderByAggregateInput = {
@@ -323,6 +468,11 @@ export type FishSpeciesMaxOrderByAggregateInput = {
   scientificName?: Prisma.SortOrder
   category?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  family?: Prisma.SortOrder
+  habitat?: Prisma.SortOrder
+  length?: Prisma.SortOrder
+  trophicLevel?: Prisma.SortOrder
+  status?: Prisma.SortOrder
 }
 
 export type FishSpeciesMinOrderByAggregateInput = {
@@ -332,6 +482,16 @@ export type FishSpeciesMinOrderByAggregateInput = {
   scientificName?: Prisma.SortOrder
   category?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  family?: Prisma.SortOrder
+  habitat?: Prisma.SortOrder
+  length?: Prisma.SortOrder
+  trophicLevel?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+}
+
+export type FishSpeciesSumOrderByAggregateInput = {
+  length?: Prisma.SortOrder
+  trophicLevel?: Prisma.SortOrder
 }
 
 export type FishSpeciesScalarRelationFilter = {
@@ -341,6 +501,14 @@ export type FishSpeciesScalarRelationFilter = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type FishSpeciesCreateNestedOneWithoutCatchDetailsInput = {
@@ -364,6 +532,11 @@ export type FishSpeciesCreateWithoutCatchDetailsInput = {
   scientificName?: string | null
   category?: string | null
   imageUrl?: string | null
+  family?: string | null
+  habitat?: string | null
+  length?: number | null
+  trophicLevel?: number | null
+  status?: string | null
 }
 
 export type FishSpeciesUncheckedCreateWithoutCatchDetailsInput = {
@@ -373,6 +546,11 @@ export type FishSpeciesUncheckedCreateWithoutCatchDetailsInput = {
   scientificName?: string | null
   category?: string | null
   imageUrl?: string | null
+  family?: string | null
+  habitat?: string | null
+  length?: number | null
+  trophicLevel?: number | null
+  status?: string | null
 }
 
 export type FishSpeciesCreateOrConnectWithoutCatchDetailsInput = {
@@ -398,6 +576,11 @@ export type FishSpeciesUpdateWithoutCatchDetailsInput = {
   scientificName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  family?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  habitat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  length?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  trophicLevel?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type FishSpeciesUncheckedUpdateWithoutCatchDetailsInput = {
@@ -407,6 +590,11 @@ export type FishSpeciesUncheckedUpdateWithoutCatchDetailsInput = {
   scientificName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  family?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  habitat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  length?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  trophicLevel?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -447,6 +635,11 @@ export type FishSpeciesSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   scientificName?: boolean
   category?: boolean
   imageUrl?: boolean
+  family?: boolean
+  habitat?: boolean
+  length?: boolean
+  trophicLevel?: boolean
+  status?: boolean
   catchDetails?: boolean | Prisma.FishSpecies$catchDetailsArgs<ExtArgs>
   _count?: boolean | Prisma.FishSpeciesCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["fishSpecies"]>
@@ -458,6 +651,11 @@ export type FishSpeciesSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   scientificName?: boolean
   category?: boolean
   imageUrl?: boolean
+  family?: boolean
+  habitat?: boolean
+  length?: boolean
+  trophicLevel?: boolean
+  status?: boolean
 }, ExtArgs["result"]["fishSpecies"]>
 
 export type FishSpeciesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -467,6 +665,11 @@ export type FishSpeciesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   scientificName?: boolean
   category?: boolean
   imageUrl?: boolean
+  family?: boolean
+  habitat?: boolean
+  length?: boolean
+  trophicLevel?: boolean
+  status?: boolean
 }, ExtArgs["result"]["fishSpecies"]>
 
 export type FishSpeciesSelectScalar = {
@@ -476,9 +679,14 @@ export type FishSpeciesSelectScalar = {
   scientificName?: boolean
   category?: boolean
   imageUrl?: boolean
+  family?: boolean
+  habitat?: boolean
+  length?: boolean
+  trophicLevel?: boolean
+  status?: boolean
 }
 
-export type FishSpeciesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "localName" | "scientificName" | "category" | "imageUrl", ExtArgs["result"]["fishSpecies"]>
+export type FishSpeciesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "localName" | "scientificName" | "category" | "imageUrl" | "family" | "habitat" | "length" | "trophicLevel" | "status", ExtArgs["result"]["fishSpecies"]>
 export type FishSpeciesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   catchDetails?: boolean | Prisma.FishSpecies$catchDetailsArgs<ExtArgs>
   _count?: boolean | Prisma.FishSpeciesCountOutputTypeDefaultArgs<ExtArgs>
@@ -498,6 +706,11 @@ export type $FishSpeciesPayload<ExtArgs extends runtime.Types.Extensions.Interna
     scientificName: string | null
     category: string | null
     imageUrl: string | null
+    family: string | null
+    habitat: string | null
+    length: number | null
+    trophicLevel: number | null
+    status: string | null
   }, ExtArgs["result"]["fishSpecies"]>
   composites: {}
 }
@@ -928,6 +1141,11 @@ export interface FishSpeciesFieldRefs {
   readonly scientificName: Prisma.FieldRef<"FishSpecies", 'String'>
   readonly category: Prisma.FieldRef<"FishSpecies", 'String'>
   readonly imageUrl: Prisma.FieldRef<"FishSpecies", 'String'>
+  readonly family: Prisma.FieldRef<"FishSpecies", 'String'>
+  readonly habitat: Prisma.FieldRef<"FishSpecies", 'String'>
+  readonly length: Prisma.FieldRef<"FishSpecies", 'Float'>
+  readonly trophicLevel: Prisma.FieldRef<"FishSpecies", 'Float'>
+  readonly status: Prisma.FieldRef<"FishSpecies", 'String'>
 }
     
 

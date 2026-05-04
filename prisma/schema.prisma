@@ -42,6 +42,11 @@ model FishSpecies {
   scientificName String?
   category       String?
   imageUrl       String?
+  family         String?       // e.g., "Acanthuridae"
+  habitat        String?       // e.g., "reef-associated"
+  length         Float?        // in cm, e.g., 50.0
+  trophicLevel   Float?        // e.g., 2.5
+  status         String?       // e.g., "native", "endangered"
   catchDetails   CatchDetail[]
 }
 
