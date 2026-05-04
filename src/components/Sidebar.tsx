@@ -29,6 +29,7 @@ export function Sidebar() {
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: Users, label: "Fishermen", href: "/fishermen" },
+    { icon: Fish, label: "Fish Directory", href: "/fish-directory" },
     { icon: Fish, label: "Catch Logging", href: "/catches" },
     { icon: BarChart3, label: "Reports", href: "/reports" },
     { icon: FileText, label: "Import Data", href: "/import" },

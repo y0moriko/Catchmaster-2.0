@@ -113,7 +113,12 @@ export const FishSpeciesScalarFieldEnum = {
   localName: 'localName',
   scientificName: 'scientificName',
   category: 'category',
-  imageUrl: 'imageUrl'
+  imageUrl: 'imageUrl',
+  family: 'family',
+  habitat: 'habitat',
+  length: 'length',
+  trophicLevel: 'trophicLevel',
+  status: 'status'
 } as const
 
 export type FishSpeciesScalarFieldEnum = (typeof FishSpeciesScalarFieldEnum)[keyof typeof FishSpeciesScalarFieldEnum]

@@ -2,39 +2,37 @@ import {
   Fish, 
   Users, 
   TrendingUp, 
-  Ship,
-  BarChart3
+  BarChart3 
 } from "lucide-react";
 import { getDashboardStats } from "@/lib/actions/dashboard";
 import { getRecentCatches } from "@/lib/actions/catch";
 import { getCatchIntelligence } from "@/lib/actions/intelligence";
+import { getWeeklyCatchData, getSpeciesDistribution, getMonthlyTrends } from "@/lib/actions/dashboard";
 import { CatchIntelligence } from "@/components/Intelligence";
 import Link from "next/link";
 
 export default async function DashboardPage() {
-  const [stats, recentCatches, intelligence] = await Promise.all([
+  const [stats, recentCatches, intelligence, weeklyData, speciesData, monthlyData] = await Promise.all([
     getDashboardStats(),
     getRecentCatches(5),
     getCatchIntelligence(),
+    getWeeklyCatchData(),
+    getSpeciesDistribution(),
+    getMonthlyTrends(),
   ]);
 
   const safeStats = stats || {
     totalWeight: 0,
     activeFishermen: 0,
-    topSpecies: "N/A",
+    topSpecies: [],
     totalUsers: 0,
   };
 
-  const statCards = [
-    { label: "Total Catch (kg)", value: safeStats.totalWeight.toLocaleString(), icon: Fish, trend: "Overall", color: "text-blue-600" },
-    { label: "Active Fishermen", value: safeStats.activeFishermen.toString(), icon: Users, trend: "Registered", color: "text-green-600" },
-    { label: "Top Species", value: safeStats.topSpecies, icon: Ship, trend: "Most Weighted", color: "text-amber-600" },
-    { label: "System Users", value: safeStats.totalUsers.toString(), icon: TrendingUp, trend: "Admin/Staff", color: "text-primary" },
-  ];
+  const maxWeeklyWeight = Math.max(...weeklyData.map((d: any) => d.weight), 1);
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-wrap justify-between items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-primary">Dashboard Overview</h1>
           <p className="text-muted-foreground">Monitor and manage local fishing activity in Agdangan.</p>
@@ -50,23 +48,154 @@ export default async function DashboardPage() {
       <CatchIntelligence data={intelligence} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statCards.map((stat) => (
-          <div key={stat.label} className="bg-white p-6 rounded-xl border border-border shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`p-2 rounded-lg bg-slate-50 ${stat.color}`}>
-                <stat.icon className="w-6 h-6" />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground px-2 py-1 bg-slate-100 rounded-full">
-                {stat.trend}
-              </span>
+        <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
+              <Fish className="w-6 h-6" />
             </div>
-            <h3 className="text-sm font-medium text-muted-foreground">{stat.label}</h3>
-            <p className="text-2xl font-bold text-primary mt-1">{stat.value}</p>
+            <span className="text-xs font-medium text-muted-foreground px-2 py-1 bg-slate-100 rounded-full">
+              Total
+            </span>
           </div>
-        ))}
+          <h3 className="text-sm font-medium text-muted-foreground">Total Catch (kg)</h3>
+          <p className="text-2xl font-bold text-primary mt-1">{safeStats.totalWeight.toLocaleString()}</p>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 rounded-lg bg-green-50 text-green-600">
+              <Users className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-medium text-muted-foreground px-2 py-1 bg-slate-100 rounded-full">
+              Registered
+            </span>
+          </div>
+          <h3 className="text-sm font-medium text-muted-foreground">Active Fishermen</h3>
+          <p className="text-2xl font-bold text-primary mt-1">{safeStats.activeFishermen}</p>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
+              <BarChart3 className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-medium text-muted-foreground px-2 py-1 bg-slate-100 rounded-full">
+              Top Species
+            </span>
+          </div>
+          <h3 className="text-sm font-medium text-muted-foreground">Top Catch Species</h3>
+          <div className="mt-1">
+            {safeStats.topSpecies.length > 0 ? (
+              safeStats.topSpecies.slice(0, 3).map((s: any, i: number) => (
+                <p key={i} className="text-sm font-bold text-primary">{s.name} ({s.weight.toFixed(0)} kg)</p>
+              ))
+            ) : (
+              <p className="text-2xl font-bold text-primary mt-1">N/A</p>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 rounded-lg bg-slate-50 text-primary">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-medium text-muted-foreground px-2 py-1 bg-slate-100 rounded-full">
+              Users
+            </span>
+          </div>
+          <h3 className="text-sm font-medium text-muted-foreground">System Users</h3>
+          <p className="text-2xl font-bold text-primary mt-1">{safeStats.totalUsers}</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
+          <h3 className="text-lg font-semibold text-primary mb-6">Weekly Catch Trends</h3>
+          {weeklyData.length > 0 ? (
+            <div className="space-y-4">
+              {weeklyData.map((day: any, i: number) => (
+                <div key={i} className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium text-slate-700">{day.date}</span>
+                    <span className="text-slate-500">{day.weight.toFixed(0)} kg ({day.count} catches)</span>
+                  </div>
+                  <div className="w-full bg-slate-100 rounded-full h-2">
+                    <div 
+                      className="bg-primary h-2 rounded-full transition-all" 
+                      style={{ width: `${(day.weight / maxWeeklyWeight) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+              No data for the last 7 days
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
+          <h3 className="text-lg font-semibold text-primary mb-6">Top Species Distribution</h3>
+          {speciesData.length > 0 ? (
+            <div className="space-y-4">
+              {speciesData.map((s: any, i: number) => {
+                const maxWeight = Math.max(...speciesData.map((d: any) => d.weight), 1);
+                return (
+                  <div key={i} className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="font-medium text-slate-700">{s.name}</span>
+                      <span className="text-slate-500">{(s.weight / 1000).toFixed(1)} kg</span>
+                    </div>
+                    <div className="w-full bg-slate-100 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full transition-all" 
+                        style={{ width: `${(s.weight / maxWeight) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+              No species data available
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
+          <h3 className="text-lg font-semibold text-primary mb-6">Monthly Trends</h3>
+          {monthlyData.length > 0 ? (
+            <div className="space-y-4">
+              {monthlyData.map((month: any, i: number) => {
+                const maxWeight = Math.max(...monthlyData.map((d: any) => d.weight), 1);
+                return (
+                  <div key={i} className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="font-medium text-slate-700">{month.month}</span>
+                      <span className="text-slate-500">{month.weight.toFixed(0)} kg ({month.count} catches)</span>
+                    </div>
+                    <div className="w-full bg-slate-100 rounded-full h-2">
+                      <div 
+                        className="bg-green-600 h-2 rounded-full transition-all" 
+                        style={{ width: `${(month.weight / maxWeight) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+              No data for the last 6 months
+            </div>
+          )}
+        </div>
+
         <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold text-primary">Recent Catches</h3>
@@ -93,10 +222,10 @@ export default async function DashboardPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-bold text-primary">
-                      {c.details.reduce((sum, d) => sum + d.weight, 0).toFixed(1)} kg
+                      {c.details.reduce((sum: number, d: any) => sum + d.weight, 0).toFixed(1)} kg
                     </p>
                     <p className="text-xs text-muted-foreground truncate max-w-[150px]">
-                      {c.details.map(d => d.fish.name).join(", ")}
+                      {c.details.map((d: any) => d.fish.name).join(", ")}
                     </p>
                   </div>
                 </div>
@@ -106,16 +235,6 @@ export default async function DashboardPage() {
                 No catches recorded yet.
               </div>
             )}
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl border border-border shadow-sm flex items-center justify-center min-h-[300px]">
-          <div className="text-center">
-            <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <BarChart3 className="w-8 h-8 text-primary/40" />
-            </div>
-            <h3 className="text-sm font-medium text-primary">Weekly Trends Chart</h3>
-            <p className="text-xs text-muted-foreground mt-1">Analytics will be displayed here</p>
           </div>
         </div>
       </div>

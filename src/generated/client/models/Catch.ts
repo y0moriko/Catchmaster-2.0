@@ -553,14 +553,6 @@ export type CatchUncheckedUpdateManyWithoutFishermanNestedInput = {
   deleteMany?: Prisma.CatchScalarWhereInput | Prisma.CatchScalarWhereInput[]
 }
 
-export type NullableFloatFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type CatchCreateNestedOneWithoutDetailsInput = {
   create?: Prisma.XOR<Prisma.CatchCreateWithoutDetailsInput, Prisma.CatchUncheckedCreateWithoutDetailsInput>
   connectOrCreate?: Prisma.CatchCreateOrConnectWithoutDetailsInput
