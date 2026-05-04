@@ -4,7 +4,6 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  GEMINI_API_KEY = "AIzaSyCEFKWf_YzNaIY4V2rq0BndLC8ucp4bfpA"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
