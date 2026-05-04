@@ -606,6 +606,7 @@ export type CatchCreateOrConnectWithoutRecorderInput = {
 
 export type CatchCreateManyRecorderInputEnvelope = {
   data: Prisma.CatchCreateManyRecorderInput | Prisma.CatchCreateManyRecorderInput[]
+  skipDuplicates?: boolean
 }
 
 export type CatchUpsertWithWhereUniqueWithoutRecorderInput = {
@@ -670,6 +671,7 @@ export type CatchCreateOrConnectWithoutFishermanInput = {
 
 export type CatchCreateManyFishermanInputEnvelope = {
   data: Prisma.CatchCreateManyFishermanInput | Prisma.CatchCreateManyFishermanInput[]
+  skipDuplicates?: boolean
 }
 
 export type CatchUpsertWithWhereUniqueWithoutFishermanInput = {
@@ -1633,6 +1635,7 @@ export type CatchCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * The data used to create many Catches.
    */
   data: Prisma.CatchCreateManyInput | Prisma.CatchCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1651,6 +1654,7 @@ export type CatchCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    * The data used to create many Catches.
    */
   data: Prisma.CatchCreateManyInput | Prisma.CatchCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

@@ -1151,6 +1151,7 @@ export type FishermanCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * The data used to create many Fishermen.
    */
   data: Prisma.FishermanCreateManyInput | Prisma.FishermanCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1169,6 +1170,7 @@ export type FishermanCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exten
    * The data used to create many Fishermen.
    */
   data: Prisma.FishermanCreateManyInput | Prisma.FishermanCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

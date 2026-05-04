@@ -490,6 +490,7 @@ export type CatchDetailCreateOrConnectWithoutFishInput = {
 
 export type CatchDetailCreateManyFishInputEnvelope = {
   data: Prisma.CatchDetailCreateManyFishInput | Prisma.CatchDetailCreateManyFishInput[]
+  skipDuplicates?: boolean
 }
 
 export type CatchDetailUpsertWithWhereUniqueWithoutFishInput = {
@@ -540,6 +541,7 @@ export type CatchDetailCreateOrConnectWithoutCatchInput = {
 
 export type CatchDetailCreateManyCatchInputEnvelope = {
   data: Prisma.CatchDetailCreateManyCatchInput | Prisma.CatchDetailCreateManyCatchInput[]
+  skipDuplicates?: boolean
 }
 
 export type CatchDetailUpsertWithWhereUniqueWithoutCatchInput = {
@@ -1344,6 +1346,7 @@ export type CatchDetailCreateManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data used to create many CatchDetails.
    */
   data: Prisma.CatchDetailCreateManyInput | Prisma.CatchDetailCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1362,6 +1365,7 @@ export type CatchDetailCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    * The data used to create many CatchDetails.
    */
   data: Prisma.CatchDetailCreateManyInput | Prisma.CatchDetailCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

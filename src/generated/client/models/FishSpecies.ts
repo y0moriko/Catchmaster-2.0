@@ -1162,6 +1162,7 @@ export type FishSpeciesCreateManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data used to create many FishSpecies.
    */
   data: Prisma.FishSpeciesCreateManyInput | Prisma.FishSpeciesCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1180,6 +1181,7 @@ export type FishSpeciesCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    * The data used to create many FishSpecies.
    */
   data: Prisma.FishSpeciesCreateManyInput | Prisma.FishSpeciesCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

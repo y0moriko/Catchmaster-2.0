@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {
@@ -54,7 +54,7 @@ model Catch {
   date        DateTime      @default(now())
   location    String?
   details     CatchDetail[]
-  
+
   // New: Weather data snapshot for intelligence and trend analysis
   weatherCondition String? // e.g., "Sunny", "Stormy", "Rainy"
   temperature      Float?

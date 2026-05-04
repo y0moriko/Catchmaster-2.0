@@ -1016,6 +1016,7 @@ export type ReportTemplateCreateManyArgs<ExtArgs extends runtime.Types.Extension
    * The data used to create many ReportTemplates.
    */
   data: Prisma.ReportTemplateCreateManyInput | Prisma.ReportTemplateCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1034,6 +1035,7 @@ export type ReportTemplateCreateManyAndReturnArgs<ExtArgs extends runtime.Types.
    * The data used to create many ReportTemplates.
    */
   data: Prisma.ReportTemplateCreateManyInput | Prisma.ReportTemplateCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
