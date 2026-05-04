@@ -21,77 +21,30 @@ export async function parseFishPDFAndImport(formData: FormData): Promise<{ succe
     const file = formData.get("pdfFile") as File;
     if (!file) throw new Error("No file provided");
 
-    // Get PDF as base64
+    // Extract text from PDF server-side using pdfjs-dist
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const base64 = buffer.toString('base64');
+    const text = await extractTextFromPDF(arrayBuffer);
 
-    // Use Gemini API directly - it supports PDF uploads natively
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [
-            {
-              text: `Parse the attached PDF document containing fish species data from Tayabas Bay, Philippines. 
-Extract all fish species data into JSON format. The columns are: Species (scientific name), Name (local name), Family, Habitat, Length (cm TL), Trophic Level, Status.
-
-Return ONLY a JSON array with objects containing: scientificName, localName, family, habitat, length (number), trophicLevel (number), status.
-Example: [{"scientificName": "Acanthurus mata", "localName": "Elongate surgeonfish", "family": "Acanthuridae", "habitat": "reef-associated", "length": 50.0, "trophicLevel": 2.5, "status": "native"}]
-
-For status, default to "native" if not specified. Only return valid JSON.`
-            },
-            {
-              inline_data: {
-                mime_type: "application/pdf",
-                data: base64
-              }
-            }
-          ]
-        }],
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Gemini API error: ${response.status} ${errorText}`);
+    if (!text.trim()) {
+      throw new Error("Could not extract text from PDF. Try pasting the data directly.");
     }
 
-    const result = await response.json();
-    const content = result.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    // Send extracted text to OpenRouter AI
+    const parseResult = await parseTextWithOpenRouter(text);
 
-    // Extract JSON from the response
-    const jsonMatch = content.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) {
-      throw new Error("No valid JSON found in AI response");
+    if (!parseResult.success || !parseResult.data) {
+      return { success: false, error: parseResult.error || "Failed to parse PDF" };
     }
-
-    const fishData = JSON.parse(jsonMatch[0]) as FishSpeciesData[];
-
-    // Transform the data
-    const transformed = fishData.map((fish) => ({
-      name: fish.localName || fish.scientificName || "Unknown",
-      localName: fish.localName || fish.scientificName || "Unknown",
-      scientificName: fish.scientificName,
-      family: fish.family,
-      habitat: fish.habitat,
-      length: fish.length,
-      trophicLevel: fish.trophicLevel,
-      status: fish.status || "native",
-    }));
 
     // Import the parsed data
-    const importResult = await createManyFishSpecies(transformed);
+    const importResult = await createManyFishSpecies(parseResult.data);
 
     if (!importResult.success) {
       return { success: false, error: importResult.error || "Failed to import species" };
     }
 
     revalidatePath("/fish-directory");
-    return { success: true, data: transformed, count: importResult.count };
+    return { success: true, data: parseResult.data, count: importResult.count };
   } catch (error: unknown) {
     console.error("Error parsing PDF:", error);
     const message = error instanceof Error ? error.message : "Failed to parse PDF";
@@ -99,7 +52,32 @@ For status, default to "native" if not specified. Only return valid JSON.`
   }
 }
 
-export async function parseFishDataWithAI(text: string): Promise<{ success: boolean; data?: FishSpeciesData[]; error?: string }> {
+async function extractTextFromPDF(arrayBuffer: ArrayBuffer): Promise<string> {
+  try {
+    // Dynamic import to avoid bundling issues
+    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    
+    // Set worker to null for Node.js environment
+    pdfjsLib.GlobalWorkerOptions.workerPort = null as any;
+
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = '';
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map((item: any) => item.str).join(' ');
+      fullText += pageText + '\n';
+    }
+
+    return fullText;
+  } catch (err) {
+    console.error("PDF extraction error:", err);
+    throw new Error("Failed to extract text from PDF. The PDF might be scanned or image-based.");
+  }
+}
+
+async function parseTextWithOpenRouter(text: string): Promise<{ success: boolean; data?: FishSpeciesData[]; error?: string }> {
   try {
     const prompt = `Parse the following text from a fish species document for Tayabas Bay, Philippines. 
 Extract all fish species data into JSON format. The columns are: Species (scientific name), Name (local name), Family, Habitat, Length (cm TL), Trophic Level, Status.
@@ -112,25 +90,30 @@ Example: [{"scientificName": "Acanthurus mata", "localName": "Elongate surgeonfi
 
 If the data uses different column names, map them appropriately. For status, default to "native" if not specified. Only return valid JSON.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`, {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
+        "Authorization": `Bearer ${env.OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [{ text: prompt }]
-        }],
+        model: "google/gemini-2.0-flash-001",
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Gemini API error: ${response.status} ${errorText}`);
+      throw new Error(`OpenRouter API error: ${response.status} ${errorText}`);
     }
 
     const result = await response.json();
-    const content = result.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const content = result.choices?.[0]?.message?.content || "";
 
     // Extract JSON from the response
     const jsonMatch = content.match(/\[[\s\S]*\]/);
@@ -154,10 +137,14 @@ If the data uses different column names, map them appropriately. For status, def
 
     return { success: true, data: transformed };
   } catch (error: unknown) {
-    console.error("Error parsing fish data with AI:", error);
-    const message = error instanceof Error ? error.message : "Failed to parse fish data";
+    console.error("Error parsing with AI:", error);
+    const message = error instanceof Error ? error.message : "Failed to parse with AI";
     return { success: false, error: message };
   }
+}
+
+export async function parseFishDataWithAI(text: string): Promise<{ success: boolean; data?: FishSpeciesData[]; error?: string }> {
+  return parseTextWithOpenRouter(text);
 }
 
 export async function getFishSpecies(page = 1, pageSize = 50) {
