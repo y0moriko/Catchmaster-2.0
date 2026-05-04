@@ -50,16 +50,20 @@ export async function parseFishTextAndImport(formData: FormData): Promise<{ succ
 
 async function parseTextWithOpenRouter(text: string): Promise<{ success: boolean; data?: FishSpeciesData[]; error?: string }> {
   try {
-    const prompt = `Parse the following text from a fish species document for Tayabas Bay, Philippines. 
-Extract all fish species data into JSON format. The columns are: Species (scientific name), Name (local name), Family, Habitat, Length (cm TL), Trophic Level, Status.
+    const prompt = `You are a JSON-only parser. Parse the following fish species text from Tayabas Bay, Philippines into a JSON array.
 
-Text:
+Text to parse:
 ${text}
 
-Return ONLY a JSON array with objects containing: scientificName, localName, family, habitat, length (number), trophicLevel (number), status.
-Example: [{"scientificName": "Acanthurus mata", "localName": "Elongate surgeonfish", "family": "Acanthuridae", "habitat": "reef-associated", "length": 50.0, "trophicLevel": 2.5, "status": "native"}]
+REQUIRED OUTPUT FORMAT - Return ONLY a valid JSON array, no markdown, no explanation, no code blocks:
+[{"scientificName": "string", "localName": "string", "family": "string", "habitat": "string", "length": number, "trophicLevel": number, "status": "string"}]
 
-If the data uses different column names, map them appropriately. For status, default to "native" if not specified. Only return valid JSON.`;
+Rules:
+- Each fish species becomes one object in the array
+- "length" and "trophicLevel" must be numbers, not strings
+- Default "status" to "native" if missing
+- Map any column variations (e.g. "Species Name" → "scientificName", "Species" → "localName") appropriately
+- Return ONLY the JSON array, nothing else`;
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -86,13 +90,19 @@ If the data uses different column names, map them appropriately. For status, def
     const result = await response.json();
     const content = result.choices?.[0]?.message?.content || "";
 
-    // Extract JSON from the response
-    const jsonMatch = content.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) {
+    // Extract JSON from the response (handle markdown code blocks or bare JSON)
+    const jsonMatch = content.match(/```(?:json)?\s*(\[[\s\S]*?\])\s*```/) || content.match(/(\[[\s\S]*?\])\s*$/);
+    const jsonString = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : null;
+    if (!jsonString) {
       throw new Error("No valid JSON found in AI response");
     }
 
-    const fishData = JSON.parse(jsonMatch[0]) as FishSpeciesData[];
+    let fishData: FishSpeciesData[];
+    try {
+      fishData = JSON.parse(jsonString) as FishSpeciesData[];
+    } catch {
+      throw new Error("Failed to parse JSON from AI response");
+    }
 
     // Transform the data
     const transformed = fishData.map((fish) => ({
