@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  firstName     String
+  lastName      String
+  email         String    @unique
+  password      String
+  roleId        String
+  role          Role      @relation(fields: [roleId], references: [id])
+  fisherman     Fisherman?
+  recordedCatches Catch[]   @relation("RecordedBy")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Role {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
+}
+
+model Fisherman {
+  id            String  @id
+  user          User    @relation(fields: [id], references: [id])
+  barangay      String
+  contactNumber String
+  catches       Catch[]
+}
+
+model FishSpecies {
+  id             String        @id @default(cuid())
+  name           String
+  localName      String
+  scientificName String?
+  category       String?
+  imageUrl       String?
+  catchDetails   CatchDetail[]
+}
+
+model Catch {
+  id          String        @id @default(cuid())
+  fishermanId String
+  fisherman   Fisherman     @relation(fields: [fishermanId], references: [id])
+  recordedBy  String
+  recorder    User          @relation("RecordedBy", fields: [recordedBy], references: [id])
+  date        DateTime      @default(now())
+  location    String?
+  details     CatchDetail[]
+  
+  // New: Weather data snapshot for intelligence and trend analysis
+  weatherCondition String? // e.g., "Sunny", "Stormy", "Rainy"
+  temperature      Float?
+  windSpeed        Float?
+  tideLevel        String? // e.g., "High", "Low"
+}
+
+model CatchDetail {
+  id       String      @id @default(cuid())
+  catchId  String
+  catch    Catch       @relation(fields: [catchId], references: [id])
+  fishId   String
+  fish     FishSpecies @relation(fields: [fishId], references: [id])
+  quantity Int
+  weight   Float // in kg
+}
+
+// New: Report Templates for one-click generation
+model ReportTemplate {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  format      String   // e.g., "PDF", "CSV"
+  config      String   // JSON string defining fields and layout
+  createdAt   DateTime @default(now())
+}
