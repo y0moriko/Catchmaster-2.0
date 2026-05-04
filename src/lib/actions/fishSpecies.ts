@@ -26,49 +26,42 @@ export async function parseFishPDFAndImport(formData: FormData): Promise<{ succe
     const buffer = Buffer.from(arrayBuffer);
     const base64 = buffer.toString('base64');
 
-    // Use OpenRouter with Gemini model that supports PDF
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    // Use Gemini API directly - it supports PDF uploads natively
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${env.OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.0-flash-001",
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: `Parse the attached PDF document containing fish species data from Tayabas Bay, Philippines. 
+        contents: [{
+          parts: [
+            {
+              text: `Parse the attached PDF document containing fish species data from Tayabas Bay, Philippines. 
 Extract all fish species data into JSON format. The columns are: Species (scientific name), Name (local name), Family, Habitat, Length (cm TL), Trophic Level, Status.
 
 Return ONLY a JSON array with objects containing: scientificName, localName, family, habitat, length (number), trophicLevel (number), status.
 Example: [{"scientificName": "Acanthurus mata", "localName": "Elongate surgeonfish", "family": "Acanthuridae", "habitat": "reef-associated", "length": 50.0, "trophicLevel": 2.5, "status": "native"}]
 
 For status, default to "native" if not specified. Only return valid JSON.`
-              },
-              {
-                type: "file",
-                file: {
-                  filename: file.name,
-                  file_data: `data:application/pdf;base64,${base64}`
-                }
+            },
+            {
+              inline_data: {
+                mime_type: "application/pdf",
+                data: base64
               }
-            ],
-          },
-        ],
+            }
+          ]
+        }],
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`OpenRouter API error: ${response.status} ${errorText}`);
+      throw new Error(`Gemini API error: ${response.status} ${errorText}`);
     }
 
     const result = await response.json();
-    const content = result.choices?.[0]?.message?.content || "";
+    const content = result.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     // Extract JSON from the response
     const jsonMatch = content.match(/\[[\s\S]*\]/);
@@ -119,30 +112,25 @@ Example: [{"scientificName": "Acanthurus mata", "localName": "Elongate surgeonfi
 
 If the data uses different column names, map them appropriately. For status, default to "native" if not specified. Only return valid JSON.`;
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${env.OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.0-flash-001",
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
+        contents: [{
+          parts: [{ text: prompt }]
+        }],
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`OpenRouter API error: ${response.status} ${errorText}`);
+      throw new Error(`Gemini API error: ${response.status} ${errorText}`);
     }
 
     const result = await response.json();
-    const content = result.choices?.[0]?.message?.content || "";
+    const content = result.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     // Extract JSON from the response
     const jsonMatch = content.match(/\[[\s\S]*\]/);
