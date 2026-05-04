@@ -16,20 +16,16 @@ interface FishSpeciesData {
   status?: string;
 }
 
-export async function parseFishPDFAndImport(formData: FormData): Promise<{ success: boolean; data?: FishSpeciesData[]; error?: string; count?: number }> {
+export async function parseFishTextAndImport(formData: FormData): Promise<{ success: boolean; data?: FishSpeciesData[]; error?: string; count?: number }> {
   try {
-    const file = formData.get("pdfFile") as File;
-    if (!file) throw new Error("No file provided");
-
-    // Extract text from PDF server-side using pdfjs-dist
-    const arrayBuffer = await file.arrayBuffer();
-    const text = await extractTextFromPDF(arrayBuffer);
+    const text = formData.get("textData") as string;
+    if (!text) throw new Error("No text provided");
 
     if (!text.trim()) {
-      throw new Error("Could not extract text from PDF. Try pasting the data directly.");
+      throw new Error("Please provide text data to parse.");
     }
 
-    // Send extracted text to OpenRouter AI
+    // Send text to OpenRouter AI
     const parseResult = await parseTextWithOpenRouter(text);
 
     if (!parseResult.success || !parseResult.data) {
@@ -49,31 +45,6 @@ export async function parseFishPDFAndImport(formData: FormData): Promise<{ succe
     console.error("Error parsing PDF:", error);
     const message = error instanceof Error ? error.message : "Failed to parse PDF";
     return { success: false, error: message };
-  }
-}
-
-async function extractTextFromPDF(arrayBuffer: ArrayBuffer): Promise<string> {
-  try {
-    // Dynamic import to avoid bundling issues
-    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-    
-    // Set worker to null for Node.js environment
-    pdfjsLib.GlobalWorkerOptions.workerPort = null as any;
-
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    let fullText = '';
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items.map((item: any) => item.str).join(' ');
-      fullText += pageText + '\n';
-    }
-
-    return fullText;
-  } catch (err) {
-    console.error("PDF extraction error:", err);
-    throw new Error("Failed to extract text from PDF. The PDF might be scanned or image-based.");
   }
 }
 
