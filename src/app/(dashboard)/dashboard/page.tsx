@@ -1,24 +1,38 @@
 import { 
   Fish, 
   Users, 
-  TrendingUp, 
   BarChart3 
 } from "lucide-react";
 import { getDashboardStats } from "@/lib/actions/dashboard";
 import { getRecentCatches } from "@/lib/actions/catch";
-import { getCatchIntelligence } from "@/lib/actions/intelligence";
-import { getWeeklyCatchData, getSpeciesDistribution, getMonthlyTrends } from "@/lib/actions/dashboard";
-import { CatchIntelligence } from "@/components/Intelligence";
+import { getWeeklyCatchData, getSpeciesDistribution } from "@/lib/actions/dashboard";
 import Link from "next/link";
 
+interface WeeklyData {
+  date: string;
+  month?: string;
+  weight: number;
+  count: number;
+}
+
+interface SpeciesData {
+  name: string;
+  weight: number;
+}
+
+interface CatchDetail {
+  weight: number;
+  fish: {
+    name: string;
+  };
+}
+
 export default async function DashboardPage() {
-  const [stats, recentCatches, intelligence, weeklyData, speciesData, monthlyData] = await Promise.all([
+  const [stats, recentCatches, weeklyData, speciesData] = await Promise.all([
     getDashboardStats(),
     getRecentCatches(5),
-    getCatchIntelligence(),
     getWeeklyCatchData(),
     getSpeciesDistribution(),
-    getMonthlyTrends(),
   ]);
 
   const safeStats = stats || {
@@ -28,7 +42,9 @@ export default async function DashboardPage() {
     totalUsers: 0,
   };
 
-  const maxWeeklyWeight = Math.max(...weeklyData.map((d: any) => d.weight), 1);
+  const typedWeeklyData = weeklyData as WeeklyData[];
+  const typedSpeciesData = speciesData as SpeciesData[];
+  const maxWeeklyWeight = Math.max(...typedWeeklyData.map((d) => d.weight), 1);
 
   return (
     <div className="space-y-8">
@@ -44,8 +60,6 @@ export default async function DashboardPage() {
           Record New Catch
         </Link>
       </div>
-
-      <CatchIntelligence data={intelligence} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
@@ -86,7 +100,7 @@ export default async function DashboardPage() {
           <h3 className="text-sm font-medium text-muted-foreground">Top Catch Species</h3>
           <div className="mt-1">
             {safeStats.topSpecies.length > 0 ? (
-              safeStats.topSpecies.slice(0, 3).map((s: any, i: number) => (
+              typedSpeciesData.slice(0, 3).map((s: SpeciesData, i: number) => (
                 <p key={i} className="text-sm font-bold text-primary">{s.name} ({s.weight.toFixed(0)} kg)</p>
               ))
             ) : (
@@ -98,7 +112,7 @@ export default async function DashboardPage() {
         <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 rounded-lg bg-slate-50 text-primary">
-              <TrendingUp className="w-6 h-6" />
+              <BarChart3 className="w-6 h-6" />
             </div>
             <span className="text-xs font-medium text-muted-foreground px-2 py-1 bg-slate-100 rounded-full">
               Users
@@ -112,9 +126,9 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
           <h3 className="text-lg font-semibold text-primary mb-6">Weekly Catch Trends</h3>
-          {weeklyData.length > 0 ? (
+          {typedWeeklyData.length > 0 ? (
             <div className="space-y-4">
-              {weeklyData.map((day: any, i: number) => (
+              {typedWeeklyData.map((day: WeeklyData, i: number) => (
                 <div key={i} className="space-y-1">
                   <div className="flex justify-between text-sm">
                     <span className="font-medium text-slate-700">{day.date}</span>
@@ -138,10 +152,10 @@ export default async function DashboardPage() {
 
         <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
           <h3 className="text-lg font-semibold text-primary mb-6">Top Species Distribution</h3>
-          {speciesData.length > 0 ? (
+          {typedSpeciesData.length > 0 ? (
             <div className="space-y-4">
-              {speciesData.map((s: any, i: number) => {
-                const maxWeight = Math.max(...speciesData.map((d: any) => d.weight), 1);
+              {typedSpeciesData.map((s: SpeciesData, i: number) => {
+                const maxWeight = Math.max(...typedSpeciesData.map((d: SpeciesData) => d.weight), 1);
                 return (
                   <div key={i} className="space-y-1">
                     <div className="flex justify-between text-sm">
@@ -168,35 +182,6 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
-          <h3 className="text-lg font-semibold text-primary mb-6">Monthly Trends</h3>
-          {monthlyData.length > 0 ? (
-            <div className="space-y-4">
-              {monthlyData.map((month: any, i: number) => {
-                const maxWeight = Math.max(...monthlyData.map((d: any) => d.weight), 1);
-                return (
-                  <div key={i} className="space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span className="font-medium text-slate-700">{month.month}</span>
-                      <span className="text-slate-500">{month.weight.toFixed(0)} kg ({month.count} catches)</span>
-                    </div>
-                    <div className="w-full bg-slate-100 rounded-full h-2">
-                      <div 
-                        className="bg-green-600 h-2 rounded-full transition-all" 
-                        style={{ width: `${(month.weight / maxWeight) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-[200px] text-muted-foreground">
-              No data for the last 6 months
-            </div>
-          )}
-        </div>
-
-        <div className="bg-white p-6 rounded-xl border border-border shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold text-primary">Recent Catches</h3>
             <Link href="/reports" className="text-xs font-bold text-primary hover:underline">
@@ -222,10 +207,10 @@ export default async function DashboardPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-bold text-primary">
-                      {c.details.reduce((sum: number, d: any) => sum + d.weight, 0).toFixed(1)} kg
+                      {c.details.reduce((sum: number, d: CatchDetail) => sum + d.weight, 0).toFixed(1)} kg
                     </p>
                     <p className="text-xs text-muted-foreground truncate max-w-[150px]">
-                      {c.details.map((d: any) => d.fish.name).join(", ")}
+                      {c.details.map((d: CatchDetail) => d.fish.name).join(", ")}
                     </p>
                   </div>
                 </div>

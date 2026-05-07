@@ -16,15 +16,7 @@ if (!parsed.success) {
   for (const [key, msgs] of Object.entries(errors)) {
     if (msgs) console.error(`  - ${key}: ${msgs.join(", ")}`);
   }
-  if (process.env.NODE_ENV === "production") {
-    process.exit(1);
-  }
+  throw new Error("Invalid environment variables. Application cannot start.");
 }
 
-export const env = parsed.success ? parsed.data : {
-  DATABASE_URL: process.env.DATABASE_URL || "file:./dev.db",
-  NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || "fallback-secret-for-dev-only",
-  NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-  OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
-  GEMINI_API_KEY: process.env.GEMINI_API_KEY,
-};
+export const env = parsed.data;

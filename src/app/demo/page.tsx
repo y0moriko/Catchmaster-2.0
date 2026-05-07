@@ -12,9 +12,7 @@ export default function DemoPage() {
   const handleEnterDemo = () => {
     setIsLoading(true);
     // Directly navigate to demo dashboard without any auth call
-    setTimeout(() => {
-      router.push("/demo/dashboard");
-    }, 500);
+    router.push("/demo/dashboard");
   };
 
   return (

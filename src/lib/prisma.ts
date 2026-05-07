@@ -4,7 +4,11 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import { env } from "./env";
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+interface GlobalWithPrisma {
+  prisma?: PrismaClient;
+}
+
+const globalForPrisma = global as unknown as GlobalWithPrisma;
 
 const isPostgres = env.DATABASE_URL.startsWith("postgres://") || env.DATABASE_URL.startsWith("postgresql://");
 
