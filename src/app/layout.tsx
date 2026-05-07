@@ -8,6 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "CatchMaster - Agdangan Fish Catch Management",
   description: "Official fish catch management system for Agdangan, Quezon",
+  icons: [{ rel: "icon", url: "/logo.jpg" }],
 };
 
 export default function RootLayout({

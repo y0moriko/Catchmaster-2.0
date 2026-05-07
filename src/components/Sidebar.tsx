@@ -26,26 +26,47 @@ export function Sidebar() {
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string })?.role || "staff";
 
-  const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-    { icon: Users, label: "Fishermen", href: "/fishermen" },
-    { icon: Fish, label: "Fish Directory", href: "/fish-directory" },
-    { icon: Fish, label: "Catch Logging", href: "/catches" },
-    { icon: BarChart3, label: "Reports", href: "/reports" },
-    { icon: FileText, label: "Import Data", href: "/import" },
-    { icon: Zap, label: "Speed-Log", href: "/speedlog" },
-    { icon: BarChart3, label: "Analytics", href: "/analytics" },
-    { icon: Eye, label: "Public Dashboard", href: "/public" },
-  ].filter(item => !(item as { adminOnly?: boolean }).adminOnly || userRole === "admin");
+  const sections = [
+    {
+      label: "Overview",
+      items: [
+        { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+      ],
+    },
+    {
+      label: "Management",
+      items: [
+        { icon: Users, label: "Fishermen", href: "/fishermen" },
+        { icon: Fish, label: "Fish Directory", href: "/fish-directory" },
+      ],
+    },
+    {
+      label: "Operations",
+      items: [
+        { icon: Fish, label: "Catch Logging", href: "/catches" },
+        { icon: Zap, label: "Speed-Log", href: "/speedlog" },
+        { icon: FileText, label: "Import Data", href: "/import" },
+      ],
+    },
+    {
+      label: "Reporting",
+      items: [
+        { icon: BarChart3, label: "Reports", href: "/reports" },
+        { icon: BarChart3, label: "Analytics", href: "/analytics" },
+        { icon: Eye, label: "Public Dashboard", href: "/public" },
+      ],
+    },
+  ].map(section => ({
+    ...section,
+    items: section.items.filter(item => !(item as { adminOnly?: boolean }).adminOnly || userRole === "admin"),
+  })).filter(section => section.items.length > 0);
 
   return (
     <>
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-primary z-50 flex items-center justify-between px-4">
         <div className="flex items-center gap-3">
-          <div className="bg-white p-2 rounded-lg">
-            <Anchor className="text-primary w-5 h-5" />
-          </div>
+          <img src="/logo.jpg" alt="CatchMaster" className="w-7 h-7 rounded-lg" />
           <span className="font-bold text-xl text-white tracking-tight">CatchMaster</span>
         </div>
         <button
@@ -71,32 +92,39 @@ export function Sidebar() {
         mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className="p-6 flex items-center gap-3">
-          <div className="bg-white p-2 rounded-lg">
-            <Anchor className="text-primary w-6 h-6" />
-          </div>
+          <img src="/logo.jpg" alt="CatchMaster" className="w-8 h-8 rounded-lg" />
           <span className="font-bold text-xl tracking-tight">CatchMaster</span>
         </div>
 
-        <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-                  isActive 
-                    ? "bg-white/10 text-white font-medium" 
-                    : "text-white/70 hover:bg-white/5 hover:text-white"
-                )}
-              >
-                <item.icon className="w-5 h-5" />
-                {item.label}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 px-4 py-4 overflow-y-auto">
+          {sections.map((section) => (
+            <div key={section.label} className="mb-4">
+              <p className="px-4 mb-1 text-xs font-semibold text-white/40 uppercase tracking-widest">
+                {section.label}
+              </p>
+              <div className="space-y-0.5">
+                {section.items.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                        isActive 
+                          ? "bg-white/10 text-white font-medium" 
+                          : "text-white/70 hover:bg-white/5 hover:text-white"
+                      )}
+                    >
+                      <item.icon className="w-4 h-4" />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         <div className="p-4 border-t border-white/10">

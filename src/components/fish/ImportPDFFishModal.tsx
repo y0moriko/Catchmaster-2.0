@@ -78,15 +78,15 @@ export default function ImportPDFFishModal() {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center p-6 border-b border-border sticky top-0 bg-white">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[90vh]">
+            <div className="flex justify-between items-center p-6 border-b border-border">
               <h2 className="text-xl font-bold text-primary">Import Fish Species with AI</h2>
               <button onClick={() => { setIsOpen(false); setPreview([]); setError(""); }} className="text-muted-foreground hover:text-primary transition-colors">
                 <X className="w-6 h-6" />
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {error && (
                 <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
                   {error}
@@ -140,23 +140,23 @@ export default function ImportPDFFishModal() {
                   </div>
                 </div>
               )}
+            </div>
 
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => { setIsOpen(false); setPreview([]); setError(""); }}
-                  className="flex-1 px-4 py-2 rounded-lg border border-border hover:bg-slate-50 transition-colors font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleImport}
-                  disabled={isLoading || preview.length === 0}
-                  className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-lg font-medium disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {isLoading ? "Importing..." : `Import ${preview.length} Species`}
-                </button>
-              </div>
+            <div className="flex gap-3 p-6 border-t border-border bg-white rounded-b-2xl">
+              <button
+                type="button"
+                onClick={() => { setIsOpen(false); setPreview([]); setError(""); }}
+                className="flex-1 px-4 py-2 rounded-lg border border-border hover:bg-slate-50 transition-colors font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleImport}
+                disabled={isLoading || preview.length === 0}
+                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-lg font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isLoading ? "Importing..." : `Import ${preview.length} Species`}
+              </button>
             </div>
           </div>
         </div>
