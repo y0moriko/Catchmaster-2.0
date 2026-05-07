@@ -1,8 +1,21 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { env } from "@/lib/env";
+
+const createFishSpeciesSchema = z.object({
+  name: z.string().min(1, "Species name is required"),
+  localName: z.string().optional(),
+  scientificName: z.string().optional(),
+  category: z.string().optional(),
+  family: z.string().optional(),
+  habitat: z.string().optional(),
+  length: z.number().positive().optional(),
+  trophicLevel: z.number().positive().optional(),
+  status: z.string().optional(),
+});
 
 interface FishSpeciesData {
   name: string;
@@ -50,10 +63,18 @@ export async function parseFishTextAndImport(formData: FormData): Promise<{ succ
 
 async function parseTextWithOpenRouter(text: string): Promise<{ success: boolean; data?: FishSpeciesData[]; error?: string }> {
   try {
-    const prompt = `You are a JSON-only parser. Parse the following fish species text from Tayabas Bay, Philippines into a JSON array.
+    // Split text into chunks of ~80 lines each to avoid AI output limits
+    const lines = text.split('\n');
+    const chunkSize = 80;
+    const chunks: string[] = [];
+    for (let i = 0; i < lines.length; i += chunkSize) {
+      chunks.push(lines.slice(i, i + chunkSize).join('\n'));
+    }
+
+    const prompt = `You are a JSON-only parser. Parse the following fish species text into a JSON array.
 
 Text to parse:
-${text}
+{{TEXT}}
 
 REQUIRED OUTPUT FORMAT - Return ONLY a valid JSON array, no markdown, no explanation, no code blocks:
 [{"scientificName": "string", "localName": "string", "family": "string", "habitat": "string", "length": number, "trophicLevel": number, "status": "string"}]
@@ -62,50 +83,70 @@ Rules:
 - Each fish species becomes one object in the array
 - "length" and "trophicLevel" must be numbers, not strings
 - Default "status" to "native" if missing
-- Map any column variations (e.g. "Species Name" → "scientificName", "Species" → "localName") appropriately
+- Map any column variations appropriately
 - Return ONLY the JSON array, nothing else`;
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${env.OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.0-flash-001",
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-      }),
-    });
+    const allData: FishSpeciesData[] = [];
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`OpenRouter API error: ${response.status} ${errorText}`);
-    }
+    for (const chunk of chunks) {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.0-flash-001",
+          messages: [
+            {
+              role: "user",
+              content: prompt.replace("{{TEXT}}", chunk),
+            },
+          ],
+        }),
+      });
 
-    const result = await response.json();
-    const content = result.choices?.[0]?.message?.content || "";
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`OpenRouter API error: ${response.status} ${errorText}`);
+      }
 
-    // Extract JSON from the response (handle markdown code blocks or bare JSON)
-    const jsonMatch = content.match(/```(?:json)?\s*(\[[\s\S]*?\])\s*```/) || content.match(/(\[[\s\S]*?\])\s*$/);
-    const jsonString = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : null;
-    if (!jsonString) {
-      throw new Error("No valid JSON found in AI response");
-    }
+      const result = await response.json();
+      const content = result.choices?.[0]?.message?.content || "";
 
-    let fishData: FishSpeciesData[];
-    try {
-      fishData = JSON.parse(jsonString) as FishSpeciesData[];
-    } catch {
-      throw new Error("Failed to parse JSON from AI response");
+      // Extract JSON from the response
+      let jsonString: string | null = null;
+
+      const codeBlockMatch = content.match(/```(?:json)?\s*(\[[\s\S]*?\])\s*```/);
+      if (codeBlockMatch) {
+        jsonString = codeBlockMatch[1];
+      }
+
+      if (!jsonString) {
+        const firstBracket = content.indexOf('[');
+        const lastBracket = content.lastIndexOf(']');
+        if (firstBracket !== -1 && lastBracket > firstBracket) {
+          jsonString = content.slice(firstBracket, lastBracket + 1);
+        }
+      }
+
+      if (!jsonString) {
+        console.error("Failed chunk:", chunk.slice(0, 200));
+        throw new Error("No valid JSON found in AI response");
+      }
+
+      let fishData: FishSpeciesData[];
+      try {
+        fishData = JSON.parse(jsonString) as FishSpeciesData[];
+      } catch {
+        throw new Error("Failed to parse JSON from AI response");
+      }
+
+      allData.push(...fishData);
     }
 
     // Transform the data
-    const transformed = fishData.map((fish) => ({
+    const transformed = allData.map((fish) => ({
       name: fish.localName || fish.scientificName || "Unknown",
       localName: fish.localName || fish.scientificName || "Unknown",
       scientificName: fish.scientificName,
@@ -159,17 +200,19 @@ export async function createFishSpecies(data: {
   status?: string;
 }) {
   try {
+    const validated = createFishSpeciesSchema.parse(data);
+
     const fish = await prisma.fishSpecies.create({
       data: {
-        name: data.name,
-        localName: data.localName || data.name,
-        scientificName: data.scientificName,
-        category: data.category,
-        family: data.family,
-        habitat: data.habitat,
-        length: data.length,
-        trophicLevel: data.trophicLevel,
-        status: data.status,
+        name: validated.name,
+        localName: validated.localName || validated.name,
+        scientificName: validated.scientificName,
+        category: validated.category,
+        family: validated.family,
+        habitat: validated.habitat,
+        length: validated.length,
+        trophicLevel: validated.trophicLevel,
+        status: validated.status,
       },
     });
 
@@ -231,6 +274,60 @@ export async function createManyFishSpecies(species: Array<{
   } catch (error: unknown) {
     console.error("Error creating multiple fish species:", error);
     const message = error instanceof Error ? error.message : "Failed to import fish species";
+    return { success: false, error: message };
+  }
+}
+
+export async function getFishSpeciesById(id: string) {
+  try {
+    const species = await prisma.fishSpecies.findUnique({
+      where: { id },
+    });
+
+    if (!species) {
+      return { success: false, error: "Fish species not found" };
+    }
+
+    return { success: true, data: species };
+  } catch (error: unknown) {
+    console.error("Error fetching fish species:", error);
+    const message = error instanceof Error ? error.message : "Failed to fetch fish species";
+    return { success: false, error: message };
+  }
+}
+
+export async function updateFishSpecies(id: string, data: {
+  name?: string;
+  localName?: string;
+  scientificName?: string;
+  category?: string;
+  family?: string;
+  habitat?: string;
+  length?: number;
+  trophicLevel?: number;
+  status?: string;
+}) {
+  try {
+    const fish = await prisma.fishSpecies.update({
+      where: { id },
+      data: {
+        ...(data.name && { name: data.name }),
+        ...(data.localName && { localName: data.localName }),
+        ...(data.scientificName !== undefined && { scientificName: data.scientificName }),
+        ...(data.category !== undefined && { category: data.category }),
+        ...(data.family !== undefined && { family: data.family }),
+        ...(data.habitat !== undefined && { habitat: data.habitat }),
+        ...(data.length !== undefined && { length: data.length }),
+        ...(data.trophicLevel !== undefined && { trophicLevel: data.trophicLevel }),
+        ...(data.status !== undefined && { status: data.status }),
+      },
+    });
+
+    revalidatePath("/fish-directory");
+    return { success: true, data: fish };
+  } catch (error: unknown) {
+    console.error("Error updating fish species:", error);
+    const message = error instanceof Error ? error.message : "Failed to update fish species";
     return { success: false, error: message };
   }
 }
