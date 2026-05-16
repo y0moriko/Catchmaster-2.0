@@ -15,6 +15,7 @@ const createFishSpeciesSchema = z.object({
   length: z.number().positive().optional(),
   trophicLevel: z.number().positive().optional(),
   status: z.string().optional(),
+  imageUrl: z.string().optional(),
 });
 
 interface FishSpeciesData {
@@ -198,6 +199,7 @@ export async function createFishSpecies(data: {
   length?: number;
   trophicLevel?: number;
   status?: string;
+  imageUrl?: string;
 }) {
   try {
     const validated = createFishSpeciesSchema.parse(data);
@@ -213,6 +215,7 @@ export async function createFishSpecies(data: {
         length: validated.length,
         trophicLevel: validated.trophicLevel,
         status: validated.status,
+        imageUrl: validated.imageUrl || null,
       },
     });
 
@@ -306,6 +309,7 @@ export async function updateFishSpecies(id: string, data: {
   length?: number;
   trophicLevel?: number;
   status?: string;
+  imageUrl?: string;
 }) {
   try {
     const fish = await prisma.fishSpecies.update({
@@ -320,6 +324,7 @@ export async function updateFishSpecies(id: string, data: {
         ...(data.length !== undefined && { length: data.length }),
         ...(data.trophicLevel !== undefined && { trophicLevel: data.trophicLevel }),
         ...(data.status !== undefined && { status: data.status }),
+        ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl || null }),
       },
     });
 

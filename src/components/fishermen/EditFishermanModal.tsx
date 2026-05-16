@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Pencil } from "lucide-react";
 import { updateFisherman, getFishermanById } from "@/lib/actions/fisherman";
 import { useRouter } from "next/navigation";
+import ImageUpload from "@/components/ImageUpload";
 
 interface Fisherman {
   id: string;
@@ -11,13 +12,19 @@ interface Fisherman {
   email: string;
   barangay: string;
   contactNumber: string;
+  imageUrl?: string | null;
   totalWeight: number;
   initials: string;
 }
 
 export default function EditFishermanModal({ fisherman, onClose }: { fisherman: Fisherman; onClose: () => void }) {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [imageUrl, setImageUrl] = useState<string | null>(fisherman.imageUrl || null);
   const [formData, setFormData] = useState({
     firstName: fisherman.name.split(" ")[0] || "",
     lastName: fisherman.name.split(" ").slice(1).join(" ") || "",
@@ -32,7 +39,7 @@ export default function EditFishermanModal({ fisherman, onClose }: { fisherman: 
     setIsLoading(true);
     setError("");
 
-    const result = await updateFisherman(fisherman.id, formData);
+    const result = await updateFisherman(fisherman.id, { ...formData, imageUrl: imageUrl || undefined });
 
     if (result.success) {
       onClose();
@@ -44,8 +51,8 @@ export default function EditFishermanModal({ fisherman, onClose }: { fisherman: 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden mx-0 sm:mx-auto">
         <div className="flex justify-between items-center p-6 border-b border-border">
           <h2 className="text-xl font-bold text-primary">Edit Fisherman</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-primary transition-colors">
@@ -114,19 +121,21 @@ export default function EditFishermanModal({ fisherman, onClose }: { fisherman: 
             </select>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Contact Number</label>
-            <input
-              name="contactNumber"
-              required
-              className="w-full px-4 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary outline-none transition-all"
-              placeholder="0912 345 6789"
-              value={formData.contactNumber}
-              onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
-            />
-          </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Contact Number</label>
+                <input
+                  name="contactNumber"
+                  required
+                  className="w-full px-4 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary outline-none transition-all"
+                  placeholder="0912 345 6789"
+                  value={formData.contactNumber}
+                  onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
+                />
+              </div>
 
-          <div className="flex gap-3 pt-4">
+              <ImageUpload value={imageUrl} onChange={setImageUrl} label="Profile Picture" />
+
+              <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}

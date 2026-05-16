@@ -44,7 +44,6 @@ export function Sidebar() {
       label: "Operations",
       items: [
         { icon: Fish, label: "Catch Logging", href: "/catches" },
-        { icon: Zap, label: "Speed-Log", href: "/speedlog" },
         { icon: FileText, label: "Import Data", href: "/import" },
       ],
     },

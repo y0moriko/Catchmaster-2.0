@@ -19,6 +19,7 @@ interface FishSpecies {
   length: number | null;
   trophicLevel: number | null;
   status: string | null;
+  imageUrl?: string | null;
 }
 
 export default function FishDirectoryList({ initialData }: { initialData: FishSpecies[] }) {
@@ -297,9 +298,13 @@ export default function FishDirectoryList({ initialData }: { initialData: FishSp
               </div>
 
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
-                  <Fish className="w-6 h-6" />
-                </div>
+                {fish.imageUrl ? (
+                  <img src={fish.imageUrl} alt="" className="w-12 h-12 rounded-full object-cover" />
+                ) : (
+                  <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+                    <Fish className="w-6 h-6" />
+                  </div>
+                )}
                 <div>
                   <h3 className="font-semibold text-primary">{fish.localName}</h3>
                   <p className="text-xs text-muted-foreground italic">{fish.scientificName || fish.name}</p>

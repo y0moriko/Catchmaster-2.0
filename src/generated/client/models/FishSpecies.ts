@@ -499,10 +499,6 @@ export type FishSpeciesScalarRelationFilter = {
   isNot?: Prisma.FishSpeciesWhereInput
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type NullableFloatFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number

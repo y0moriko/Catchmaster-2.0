@@ -101,7 +101,8 @@ export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof Role
 export const FishermanScalarFieldEnum = {
   id: 'id',
   barangay: 'barangay',
-  contactNumber: 'contactNumber'
+  contactNumber: 'contactNumber',
+  imageUrl: 'imageUrl'
 } as const
 
 export type FishermanScalarFieldEnum = (typeof FishermanScalarFieldEnum)[keyof typeof FishermanScalarFieldEnum]

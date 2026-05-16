@@ -19,7 +19,7 @@ const createCatchSchema = z.object({
   })).min(1, "At least one fish detail is required"),
 });
 
-export async function getFishSpecies() {
+export async function getAllFishSpecies() {
   try {
     return await prisma.fishSpecies.findMany({
       orderBy: { name: "asc" },

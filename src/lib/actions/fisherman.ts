@@ -9,9 +9,10 @@ import crypto from "crypto";
 const createFishermanSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
+  email: z.string().email("Invalid email address").optional().or(z.literal("")),
   barangay: z.string().min(1, "Barangay is required"),
   contactNumber: z.string().min(1, "Contact number is required"),
+  imageUrl: z.string().optional(),
   password: z.string().optional(),
 });
 
@@ -46,6 +47,7 @@ export async function getFishermen(page = 1, pageSize = 20) {
         email: f.user.email,
         barangay: f.barangay,
         contactNumber: f.contactNumber,
+        imageUrl: f.imageUrl,
         totalWeight,
         initials: `${f.user.firstName[0]}${f.user.lastName[0]}`.toUpperCase(),
       };
@@ -54,7 +56,7 @@ export async function getFishermen(page = 1, pageSize = 20) {
     return { data: result, total, page, pageSize };
   } catch (error) {
     console.error("Error fetching fishermen:", error);
-    return [];
+    return { data: [], total: 0, page, pageSize };
   }
 }
 
@@ -64,6 +66,7 @@ export async function createFisherman(data: {
   email: string;
   barangay: string;
   contactNumber: string;
+  imageUrl?: string;
   password?: string;
 }) {
   try {
@@ -79,11 +82,12 @@ export async function createFisherman(data: {
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     const result = await prisma.$transaction(async (tx) => {
+      const email = validated.email || `${validated.firstName.toLowerCase()}.${validated.lastName.toLowerCase()}@catchmaster.local`;
       const user = await tx.user.create({
         data: {
           firstName: validated.firstName,
           lastName: validated.lastName,
-          email: validated.email,
+          email,
           password: hashedPassword,
           roleId: staffRole.id,
         },
@@ -94,6 +98,7 @@ export async function createFisherman(data: {
           id: user.id,
           barangay: validated.barangay,
           contactNumber: validated.contactNumber,
+          imageUrl: validated.imageUrl || null,
         },
       });
 
@@ -146,6 +151,7 @@ export async function updateFisherman(id: string, data: {
   email?: string;
   barangay?: string;
   contactNumber?: string;
+  imageUrl?: string;
   password?: string;
 }) {
   try {
@@ -163,9 +169,10 @@ export async function updateFisherman(id: string, data: {
         });
       }
 
-      const updateFisherman: { barangay?: string; contactNumber?: string } = {};
+      const updateFisherman: { barangay?: string; contactNumber?: string; imageUrl?: string | null } = {};
       if (data.barangay) updateFisherman.barangay = data.barangay;
       if (data.contactNumber) updateFisherman.contactNumber = data.contactNumber;
+      if (data.imageUrl !== undefined) updateFisherman.imageUrl = data.imageUrl || null;
 
       if (Object.keys(updateFisherman).length > 0) {
         await tx.fisherman.update({
