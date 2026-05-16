@@ -28,18 +28,21 @@ export type FishermanMinAggregateOutputType = {
   id: string | null
   barangay: string | null
   contactNumber: string | null
+  imageUrl: string | null
 }
 
 export type FishermanMaxAggregateOutputType = {
   id: string | null
   barangay: string | null
   contactNumber: string | null
+  imageUrl: string | null
 }
 
 export type FishermanCountAggregateOutputType = {
   id: number
   barangay: number
   contactNumber: number
+  imageUrl: number
   _all: number
 }
 
@@ -48,18 +51,21 @@ export type FishermanMinAggregateInputType = {
   id?: true
   barangay?: true
   contactNumber?: true
+  imageUrl?: true
 }
 
 export type FishermanMaxAggregateInputType = {
   id?: true
   barangay?: true
   contactNumber?: true
+  imageUrl?: true
 }
 
 export type FishermanCountAggregateInputType = {
   id?: true
   barangay?: true
   contactNumber?: true
+  imageUrl?: true
   _all?: true
 }
 
@@ -139,6 +145,7 @@ export type FishermanGroupByOutputType = {
   id: string
   barangay: string
   contactNumber: string
+  imageUrl: string | null
   _count: FishermanCountAggregateOutputType | null
   _min: FishermanMinAggregateOutputType | null
   _max: FishermanMaxAggregateOutputType | null
@@ -166,6 +173,7 @@ export type FishermanWhereInput = {
   id?: Prisma.StringFilter<"Fisherman"> | string
   barangay?: Prisma.StringFilter<"Fisherman"> | string
   contactNumber?: Prisma.StringFilter<"Fisherman"> | string
+  imageUrl?: Prisma.StringNullableFilter<"Fisherman"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   catches?: Prisma.CatchListRelationFilter
 }
@@ -174,6 +182,7 @@ export type FishermanOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   barangay?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   catches?: Prisma.CatchOrderByRelationAggregateInput
 }
@@ -185,6 +194,7 @@ export type FishermanWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.FishermanWhereInput | Prisma.FishermanWhereInput[]
   barangay?: Prisma.StringFilter<"Fisherman"> | string
   contactNumber?: Prisma.StringFilter<"Fisherman"> | string
+  imageUrl?: Prisma.StringNullableFilter<"Fisherman"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   catches?: Prisma.CatchListRelationFilter
 }, "id">
@@ -193,6 +203,7 @@ export type FishermanOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   barangay?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.FishermanCountOrderByAggregateInput
   _max?: Prisma.FishermanMaxOrderByAggregateInput
   _min?: Prisma.FishermanMinOrderByAggregateInput
@@ -205,11 +216,13 @@ export type FishermanScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Fisherman"> | string
   barangay?: Prisma.StringWithAggregatesFilter<"Fisherman"> | string
   contactNumber?: Prisma.StringWithAggregatesFilter<"Fisherman"> | string
+  imageUrl?: Prisma.StringNullableWithAggregatesFilter<"Fisherman"> | string | null
 }
 
 export type FishermanCreateInput = {
   barangay: string
   contactNumber: string
+  imageUrl?: string | null
   user: Prisma.UserCreateNestedOneWithoutFishermanInput
   catches?: Prisma.CatchCreateNestedManyWithoutFishermanInput
 }
@@ -218,12 +231,14 @@ export type FishermanUncheckedCreateInput = {
   id: string
   barangay: string
   contactNumber: string
+  imageUrl?: string | null
   catches?: Prisma.CatchUncheckedCreateNestedManyWithoutFishermanInput
 }
 
 export type FishermanUpdateInput = {
   barangay?: Prisma.StringFieldUpdateOperationsInput | string
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutFishermanNestedInput
   catches?: Prisma.CatchUpdateManyWithoutFishermanNestedInput
 }
@@ -232,6 +247,7 @@ export type FishermanUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   barangay?: Prisma.StringFieldUpdateOperationsInput | string
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   catches?: Prisma.CatchUncheckedUpdateManyWithoutFishermanNestedInput
 }
 
@@ -239,17 +255,20 @@ export type FishermanCreateManyInput = {
   id: string
   barangay: string
   contactNumber: string
+  imageUrl?: string | null
 }
 
 export type FishermanUpdateManyMutationInput = {
   barangay?: Prisma.StringFieldUpdateOperationsInput | string
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type FishermanUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   barangay?: Prisma.StringFieldUpdateOperationsInput | string
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type FishermanNullableScalarRelationFilter = {
@@ -261,18 +280,21 @@ export type FishermanCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   barangay?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrder
 }
 
 export type FishermanMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   barangay?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrder
 }
 
 export type FishermanMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   barangay?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrder
 }
 
 export type FishermanScalarRelationFilter = {
@@ -312,6 +334,10 @@ export type FishermanUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.FishermanUpdateToOneWithWhereWithoutUserInput, Prisma.FishermanUpdateWithoutUserInput>, Prisma.FishermanUncheckedUpdateWithoutUserInput>
 }
 
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
 export type FishermanCreateNestedOneWithoutCatchesInput = {
   create?: Prisma.XOR<Prisma.FishermanCreateWithoutCatchesInput, Prisma.FishermanUncheckedCreateWithoutCatchesInput>
   connectOrCreate?: Prisma.FishermanCreateOrConnectWithoutCatchesInput
@@ -329,12 +355,14 @@ export type FishermanUpdateOneRequiredWithoutCatchesNestedInput = {
 export type FishermanCreateWithoutUserInput = {
   barangay: string
   contactNumber: string
+  imageUrl?: string | null
   catches?: Prisma.CatchCreateNestedManyWithoutFishermanInput
 }
 
 export type FishermanUncheckedCreateWithoutUserInput = {
   barangay: string
   contactNumber: string
+  imageUrl?: string | null
   catches?: Prisma.CatchUncheckedCreateNestedManyWithoutFishermanInput
 }
 
@@ -357,18 +385,21 @@ export type FishermanUpdateToOneWithWhereWithoutUserInput = {
 export type FishermanUpdateWithoutUserInput = {
   barangay?: Prisma.StringFieldUpdateOperationsInput | string
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   catches?: Prisma.CatchUpdateManyWithoutFishermanNestedInput
 }
 
 export type FishermanUncheckedUpdateWithoutUserInput = {
   barangay?: Prisma.StringFieldUpdateOperationsInput | string
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   catches?: Prisma.CatchUncheckedUpdateManyWithoutFishermanNestedInput
 }
 
 export type FishermanCreateWithoutCatchesInput = {
   barangay: string
   contactNumber: string
+  imageUrl?: string | null
   user: Prisma.UserCreateNestedOneWithoutFishermanInput
 }
 
@@ -376,6 +407,7 @@ export type FishermanUncheckedCreateWithoutCatchesInput = {
   id: string
   barangay: string
   contactNumber: string
+  imageUrl?: string | null
 }
 
 export type FishermanCreateOrConnectWithoutCatchesInput = {
@@ -397,6 +429,7 @@ export type FishermanUpdateToOneWithWhereWithoutCatchesInput = {
 export type FishermanUpdateWithoutCatchesInput = {
   barangay?: Prisma.StringFieldUpdateOperationsInput | string
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutFishermanNestedInput
 }
 
@@ -404,6 +437,7 @@ export type FishermanUncheckedUpdateWithoutCatchesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   barangay?: Prisma.StringFieldUpdateOperationsInput | string
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -441,6 +475,7 @@ export type FishermanSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   id?: boolean
   barangay?: boolean
   contactNumber?: boolean
+  imageUrl?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   catches?: boolean | Prisma.Fisherman$catchesArgs<ExtArgs>
   _count?: boolean | Prisma.FishermanCountOutputTypeDefaultArgs<ExtArgs>
@@ -450,6 +485,7 @@ export type FishermanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   id?: boolean
   barangay?: boolean
   contactNumber?: boolean
+  imageUrl?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["fisherman"]>
 
@@ -457,6 +493,7 @@ export type FishermanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   id?: boolean
   barangay?: boolean
   contactNumber?: boolean
+  imageUrl?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["fisherman"]>
 
@@ -464,9 +501,10 @@ export type FishermanSelectScalar = {
   id?: boolean
   barangay?: boolean
   contactNumber?: boolean
+  imageUrl?: boolean
 }
 
-export type FishermanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "barangay" | "contactNumber", ExtArgs["result"]["fisherman"]>
+export type FishermanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "barangay" | "contactNumber" | "imageUrl", ExtArgs["result"]["fisherman"]>
 export type FishermanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   catches?: boolean | Prisma.Fisherman$catchesArgs<ExtArgs>
@@ -489,6 +527,7 @@ export type $FishermanPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     id: string
     barangay: string
     contactNumber: string
+    imageUrl: string | null
   }, ExtArgs["result"]["fisherman"]>
   composites: {}
 }
@@ -917,6 +956,7 @@ export interface FishermanFieldRefs {
   readonly id: Prisma.FieldRef<"Fisherman", 'String'>
   readonly barangay: Prisma.FieldRef<"Fisherman", 'String'>
   readonly contactNumber: Prisma.FieldRef<"Fisherman", 'String'>
+  readonly imageUrl: Prisma.FieldRef<"Fisherman", 'String'>
 }
     
 

@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CloudUpload, FileSpreadsheet, CheckCircle, AlertCircle, Download } from "lucide-react";
 import { batchImportCatches } from "@/lib/actions/intelligence";
+import { getFishermen } from "@/lib/actions/fisherman";
+import { getAllFishSpecies } from "@/lib/actions/catch";
 
 export default function ImportPage() {
   const router = useRouter();
@@ -14,17 +16,24 @@ export default function ImportPage() {
   const [error, setError] = useState("");
   const [result, setResult] = useState<{ count: number } | null>(null);
 
-  const fishermanMap: Record<string, string> = {
-    "Juan Dela Cruz": "fisherman-001",
-    "Maria Santos": "fisherman-002",
-  };
+  const [fishermanMap, setFishermanMap] = useState<Record<string, string>>({});
+  const [fishMap, setFishMap] = useState<Record<string, string>>({});
+  const [lookupsReady, setLookupsReady] = useState(false);
 
-  const fishMap: Record<string, string> = {
-    "Tuna": "fish-001",
-    "Tilapia": "fish-002",
-    "Milkfish": "fish-003",
-    "Galunggong": "fish-004",
-  };
+  useEffect(() => {
+    Promise.all([
+      getFishermen(1, 999).then(r => Array.isArray(r) ? r : r.data || []),
+      getAllFishSpecies().then(s => s || [])
+    ]).then(([f, s]) => {
+      const fm: Record<string, string> = {};
+      (f || []).forEach((fi: any) => { fm[fi.name] = fi.id; });
+      const fsm: Record<string, string> = {};
+      (s || []).forEach((sp: any) => { fsm[sp.name] = sp.id; });
+      setFishermanMap(fm);
+      setFishMap(fsm);
+      setLookupsReady(true);
+    });
+  }, []);
 
   const parseCSV = (text: string) => {
     const lines = text.split("\n").filter(l => l.trim());
@@ -60,18 +69,36 @@ export default function ImportPage() {
     setLoading(true);
     setError("");
     try {
-      const mapped = preview.map(row => ({
-        fishermanId: fishermanMap[row.Fisherman || row.fisherman || "Juan Dela Cruz"] || "fisherman-001",
-        recordedBy: "user-admin",
-        date: row.Date || row.date || new Date().toISOString(),
-        location: row.Location || row.location || "Agdangan",
-        weather: row.Weather || row.weather || "Sunny",
-        details: [{
-          fishId: fishMap[row.Species || row.species || "Tuna"] || "fish-001",
-          quantity: parseInt(row.Quantity || row.quantity || "1"),
-          weight: parseFloat(row.Weight || row.weight || "0")
-        }]
-      }));
+      const unknownFishermen = new Set<string>();
+      const unknownFish = new Set<string>();
+      const mapped = preview.map(row => {
+        const name = row.Fisherman || row.fisherman;
+        const species = row.Species || row.species;
+        const fid = name ? fishermanMap[name] : undefined;
+        const sid = species ? fishMap[species] : undefined;
+        if (!fid && name) unknownFishermen.add(name);
+        if (!sid && species) unknownFish.add(species);
+        return {
+          fishermanId: fid || "",
+          recordedBy: "",
+          date: row.Date || row.date || new Date().toISOString(),
+          location: row.Location || row.location || "Agdangan",
+          weather: row.Weather || row.weather || "Sunny",
+          details: [{
+            fishId: sid || "",
+            quantity: parseInt(row.Quantity || row.quantity || "1"),
+            weight: parseFloat(row.Weight || row.weight || "0")
+          }]
+        };
+      });
+      if (unknownFishermen.size > 0 || unknownFish.size > 0) {
+        const parts: string[] = [];
+        if (unknownFishermen.size > 0) parts.push(`Unknown fishermen: ${[...unknownFishermen].join(", ")}`);
+        if (unknownFish.size > 0) parts.push(`Unknown species: ${[...unknownFish].join(", ")}`);
+        setError(parts.join(". ") + ". Add them first in Fishermen or Fish Directory.");
+        setLoading(false);
+        return;
+      }
       const res = await batchImportCatches(mapped);
       if (res.success) {
         setResult({ count: res.count || 0 });
@@ -101,6 +128,7 @@ export default function ImportPage() {
             <CloudUpload className="w-12 h-12 text-primary/40 mx-auto mb-4" />
             <p className="font-bold text-primary mb-1">Click to upload or drag & drop</p>
             <p className="text-xs text-muted-foreground">Supports .CSV, .XLSX (export as CSV), or JSON</p>
+            {!lookupsReady && <p className="text-xs text-amber-600 mt-2">Loading reference data...</p>}
             <input ref={fileRef} type="file" accept=".csv,.json,.xlsx" onChange={handleFile} className="hidden" />
           </div>
 

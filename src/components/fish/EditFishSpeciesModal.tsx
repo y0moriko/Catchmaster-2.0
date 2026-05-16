@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Pencil } from "lucide-react";
 import { updateFishSpecies } from "@/lib/actions/fishSpecies";
 import { useRouter } from "next/navigation";
+import ImageUpload from "@/components/ImageUpload";
 
 interface FishSpecies {
   id: string;
@@ -16,11 +17,17 @@ interface FishSpecies {
   length: number | null;
   trophicLevel: number | null;
   status: string | null;
+  imageUrl?: string | null;
 }
 
 export default function EditFishSpeciesModal({ fish, onClose }: { fish: FishSpecies; onClose: () => void }) {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [imageUrl, setImageUrl] = useState<string | null>(fish.imageUrl || null);
   const [formData, setFormData] = useState({
     name: fish.name,
     localName: fish.localName,
@@ -47,6 +54,7 @@ export default function EditFishSpeciesModal({ fish, onClose }: { fish: FishSpec
       length: formData.length ? parseFloat(formData.length) : undefined,
       trophicLevel: formData.trophicLevel ? parseFloat(formData.trophicLevel) : undefined,
       status: formData.status,
+      imageUrl: imageUrl || undefined,
     });
 
     if (result.success) {
@@ -59,8 +67,9 @@ export default function EditFishSpeciesModal({ fish, onClose }: { fish: FishSpec
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: "contain" }}>
+      <div className="flex items-center justify-center min-h-screen p-3 sm:p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-0 sm:mx-auto">
         <div className="flex justify-between items-center p-6 border-b border-border sticky top-0 bg-white">
           <h2 className="text-xl font-bold text-primary">Edit Fish Species</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-primary transition-colors">
@@ -161,27 +170,30 @@ export default function EditFishSpeciesModal({ fish, onClose }: { fish: FishSpec
                 <option value="endangered">Endangered</option>
                 <option value="threatened">Threatened</option>
                 <option value="introduced">Introduced</option>
-              </select>
-            </div>
-          </div>
+                  </select>
+                </div>
+              </div>
 
-          <div className="flex gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 rounded-lg border border-border hover:bg-slate-50 transition-colors font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="flex-1 bg-primary text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors shadow-lg font-medium disabled:opacity-50"
-            >
-              {isLoading ? "Saving..." : "Save Changes"}
-            </button>
-          </div>
+              <ImageUpload value={imageUrl} onChange={setImageUrl} label="Fish Image" />
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 px-4 py-2 rounded-lg border border-border hover:bg-slate-50 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="flex-1 bg-primary text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors shadow-lg font-medium disabled:opacity-50"
+                >
+                  {isLoading ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
         </form>
+      </div>
       </div>
     </div>
   );

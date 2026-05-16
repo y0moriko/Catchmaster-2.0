@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getFishermen } from "@/lib/actions/fisherman";
-import { getFishSpecies, getCatches } from "@/lib/actions/catch";
+import { getAllFishSpecies, getCatches } from "@/lib/actions/catch";
 import CatchLoggingForm from "@/components/catches/CatchLoggingForm";
 import CatchesList from "@/components/catches/CatchesList";
 import { redirect } from "next/navigation";
@@ -12,7 +12,7 @@ export default async function CatchesPage() {
 
   const [fishermenResult, species, catchesResult] = await Promise.all([
     getFishermen(),
-    getFishSpecies(),
+    getAllFishSpecies(),
     getCatches(),
   ]);
 

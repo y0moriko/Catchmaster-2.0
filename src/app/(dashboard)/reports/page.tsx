@@ -1,10 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { FileText, Download, FileSpreadsheet, Building2, Presentation, BarChart3, Calendar, TrendingUp, Fish } from "lucide-react";
+import { useState, useEffect } from "react";
+import { FileText, Download, FileSpreadsheet, Building2, Presentation, BarChart3, Calendar, TrendingUp, Fish, Database } from "lucide-react";
 import { generateReport } from "@/lib/actions/intelligence";
-import { getRecentCatches } from "@/lib/actions/catch";
-import { getFishSpecies } from "@/lib/actions/catch";
+import { getDashboardStats } from "@/lib/actions/dashboard";
+
+const colorClasses: Record<string, { bg: string; text: string; hover: string; btn: string; btnHover: string }> = {
+  blue: { bg: "bg-blue-50", text: "text-blue-600", hover: "hover:bg-blue-700", btn: "bg-blue-600", btnHover: "hover:bg-blue-700" },
+  amber: { bg: "bg-amber-50", text: "text-amber-600", hover: "hover:bg-amber-700", btn: "bg-amber-600", btnHover: "hover:bg-amber-700" },
+  emerald: { bg: "bg-emerald-50", text: "text-emerald-600", hover: "hover:bg-emerald-700", btn: "bg-emerald-600", btnHover: "hover:bg-emerald-700" },
+  purple: { bg: "bg-purple-50", text: "text-purple-600", hover: "hover:bg-purple-700", btn: "bg-purple-600", btnHover: "hover:bg-purple-700" },
+  cyan: { bg: "bg-cyan-50", text: "text-cyan-600", hover: "hover:bg-cyan-700", btn: "bg-cyan-600", btnHover: "hover:bg-cyan-700" },
+};
 
 const TEMPLATES = [
   { id: "bfar-monthly", name: "BFAR Monthly Report", description: "Official BFAR format for monthly catch reporting to Provincial Government", icon: Building2, format: "PDF", color: "blue" },
@@ -18,6 +25,11 @@ export default function ReportsPage() {
   const [generating, setGenerating] = useState<string | null>(null);
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
   const [activeTab, setActiveTab] = useState<"reports" | "analytics">("reports");
+  const [stats, setStats] = useState<{ totalWeight: number; activeFishermen: number; totalUsers: number } | null>(null);
+
+  useEffect(() => {
+    getDashboardStats().then(setStats);
+  }, []);
 
   const handleGenerate = async (templateId: string) => {
     setGenerating(templateId);
@@ -71,10 +83,10 @@ export default function ReportsPage() {
             {TEMPLATES.map(t => (
               <div key={t.id} className="bg-white border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`p-3 rounded-xl bg-${t.color}-50`}>
-                    <t.icon className={`w-6 h-6 text-${t.color}-600`} />
+                  <div className={`p-3 rounded-xl ${colorClasses[t.color]?.bg || "bg-slate-50"}`}>
+                    <t.icon className={`w-6 h-6 ${colorClasses[t.color]?.text || "text-slate-600"}`} />
                   </div>
-                  <span className={`text-[10px] font-bold px-2 py-1 rounded-full bg-${t.color}-50 text-${t.color}-600`}>
+                  <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${colorClasses[t.color]?.bg || "bg-slate-50"} ${colorClasses[t.color]?.text || "text-slate-600"}`}>
                     {t.format}
                   </span>
                 </div>
@@ -83,7 +95,7 @@ export default function ReportsPage() {
                 <button
                   onClick={() => handleGenerate(t.id)}
                   disabled={generating === t.id}
-                  className={`w-full bg-${t.color}-600 text-white px-4 py-2.5 rounded-lg font-bold hover:bg-${t.color}-700 disabled:opacity-50 flex items-center justify-center gap-2 text-sm`}
+                  className={`w-full ${colorClasses[t.color]?.btn || "bg-slate-600"} text-white px-4 py-2.5 rounded-lg font-bold ${colorClasses[t.color]?.btnHover || "hover:bg-slate-700"} disabled:opacity-50 flex items-center justify-center gap-2 text-sm`}
                 >
                   <Download className="w-4 h-4" />
                   {generating === t.id ? "Generating..." : "Generate Report"}
@@ -95,20 +107,40 @@ export default function ReportsPage() {
       )}
 
       {activeTab === "analytics" && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-4"><Fish className="w-4 h-4 text-blue-600" /><span className="text-sm text-muted-foreground">Total Catch</span></div>
-            <p className="text-2xl font-bold text-primary">0 kg</p>
-          </div>
-          <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-4"><TrendingUp className="w-4 h-4 text-green-600" /><span className="text-sm text-muted-foreground">Total Trips</span></div>
-            <p className="text-2xl font-bold text-primary">0</p>
-          </div>
-          <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-4"><Fish className="w-4 h-4 text-amber-600" /><span className="text-sm text-muted-foreground">Species Tracked</span></div>
-            <p className="text-2xl font-bold text-primary">0</p>
-          </div>
-        </div>
+        <>
+          {stats && stats.totalWeight === 0 ? (
+            <div className="bg-white border border-border rounded-2xl p-12 shadow-sm text-center">
+              <Database className="w-16 h-16 text-slate-200 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-primary mb-2">No Data Yet</h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                Start logging catches to see analytics here. Head to{" "}
+                <a href="/catches" className="text-primary hover:underline font-medium">Catch Logging</a>{" "}
+                or import records via{" "}
+                <a href="/import" className="text-primary hover:underline font-medium">Import Data</a>.
+              </p>
+              <div className="flex justify-center gap-4">
+                <a href="/catches" className="bg-primary text-white px-6 py-2.5 rounded-lg font-bold hover:bg-slate-700 transition-colors">
+                  Log Your First Catch
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
+                <div className="flex items-center gap-2 mb-4"><Fish className="w-4 h-4 text-blue-600" /><span className="text-sm text-muted-foreground">Total Catch</span></div>
+                <p className="text-2xl font-bold text-primary">{stats?.totalWeight.toLocaleString() || "—"} kg</p>
+              </div>
+              <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
+                <div className="flex items-center gap-2 mb-4"><TrendingUp className="w-4 h-4 text-green-600" /><span className="text-sm text-muted-foreground">Active Fishermen</span></div>
+                <p className="text-2xl font-bold text-primary">{stats?.activeFishermen.toLocaleString() || "—"}</p>
+              </div>
+              <div className="bg-white border border-border rounded-xl p-6 shadow-sm">
+                <div className="flex items-center gap-2 mb-4"><Fish className="w-4 h-4 text-amber-600" /><span className="text-sm text-muted-foreground">Registered Users</span></div>
+                <p className="text-2xl font-bold text-primary">{stats?.totalUsers.toLocaleString() || "—"}</p>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

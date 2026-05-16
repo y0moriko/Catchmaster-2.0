@@ -6,8 +6,8 @@ import { revalidatePath } from "next/cache";
 export async function batchImportCatches(data: any[]) {
   try {
     const imports = data.map(row => ({
-      fishermanId: row.fishermanId || "fisherman-001",
-      recordedBy: row.recordedBy || "user-admin",
+      fishermanId: row.fishermanId,
+      recordedBy: row.recordedBy,
       date: new Date(row.date || new Date()),
       location: row.location || "Agdangan",
       weatherCondition: row.weather || row.weatherCondition || "Sunny",
@@ -16,7 +16,7 @@ export async function batchImportCatches(data: any[]) {
       tideLevel: row.tideLevel || null,
       details: {
         create: (row.details || [row]).map((d: any) => ({
-          fishId: d.fishId || "fish-001",
+          fishId: d.fishId,
           quantity: parseInt(d.quantity) || 1,
           weight: parseFloat(d.weight) || 0
         }))
@@ -41,7 +41,7 @@ export async function generateReport(templateId: string, params: any) {
   // In a real system, we'd fetch data based on params and use a library like jspdf
   return { 
     success: true, 
-    downloadUrl: `/api/reports/download/${templateId}`,
+    downloadUrl: `/api/reports/download/${templateId}/mock`,
     message: "Report generated successfully" 
   };
 }

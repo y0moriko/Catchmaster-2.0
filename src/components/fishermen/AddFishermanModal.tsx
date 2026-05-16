@@ -1,13 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, X } from "lucide-react";
 import { createFisherman } from "@/lib/actions/fisherman";
+import ImageUpload from "@/components/ImageUpload";
 
 export default function AddFishermanModal() {
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -21,6 +29,7 @@ export default function AddFishermanModal() {
       email: formData.get("email") as string,
       barangay: formData.get("barangay") as string,
       contactNumber: formData.get("contactNumber") as string,
+      imageUrl: imageUrl || undefined,
     };
 
     const result = await createFisherman(data);
@@ -45,8 +54,8 @@ export default function AddFishermanModal() {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden mx-0 sm:mx-auto">
             <div className="flex justify-between items-center p-6 border-b border-border">
               <h2 className="text-xl font-bold text-primary">Add New Fisherman</h2>
               <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-primary transition-colors">
@@ -87,9 +96,8 @@ export default function AddFishermanModal() {
                 <input 
                   name="email" 
                   type="email" 
-                  required 
                   className="w-full px-4 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary outline-none transition-all"
-                  placeholder="juan@example.com"
+                  placeholder="juan@example.com (optional)"
                 />
               </div>
 
@@ -117,6 +125,8 @@ export default function AddFishermanModal() {
                   placeholder="0912 345 6789"
                 />
               </div>
+
+              <ImageUpload value={imageUrl} onChange={setImageUrl} label="Profile Picture" />
 
               <div className="flex gap-3 pt-4">
                 <button 

@@ -1,13 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, X } from "lucide-react";
 import { createFishSpecies } from "@/lib/actions/fishSpecies";
+import ImageUpload from "@/components/ImageUpload";
 
 export default function AddFishSpeciesModal() {
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,6 +32,7 @@ export default function AddFishSpeciesModal() {
       length: formData.get("length") ? parseFloat(formData.get("length") as string) : undefined,
       trophicLevel: formData.get("trophicLevel") ? parseFloat(formData.get("trophicLevel") as string) : undefined,
       status: formData.get("status") as string || "native",
+      imageUrl: imageUrl || undefined,
     };
 
     const result = await createFishSpecies(data);
@@ -48,8 +57,9 @@ export default function AddFishSpeciesModal() {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: "contain" }}>
+          <div className="flex items-center justify-center min-h-screen p-3 sm:p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-0 sm:mx-auto">
             <div className="flex justify-between items-center p-6 border-b border-border sticky top-0 bg-white">
               <h2 className="text-xl font-bold text-primary">Add New Fish Species</h2>
               <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-primary transition-colors">
@@ -148,6 +158,8 @@ export default function AddFishSpeciesModal() {
                 </div>
               </div>
 
+              <ImageUpload value={imageUrl} onChange={setImageUrl} label="Fish Image" />
+
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
@@ -165,6 +177,7 @@ export default function AddFishSpeciesModal() {
                 </button>
               </div>
             </form>
+          </div>
           </div>
         </div>
       )}

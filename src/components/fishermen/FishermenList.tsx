@@ -14,6 +14,7 @@ interface Fisherman {
   email: string;
   barangay: string;
   contactNumber: string;
+  imageUrl?: string | null;
   totalWeight: number;
   initials: string;
 }
@@ -186,9 +187,13 @@ export default function FishermenList({ initialData }: { initialData: Fisherman[
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/5 rounded-full flex items-center justify-center text-primary font-bold text-xs">
-                        {fisherman.initials}
-                      </div>
+                      {fisherman.imageUrl ? (
+                        <img src={fisherman.imageUrl} alt="" className="w-8 h-8 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-8 h-8 bg-primary/5 rounded-full flex items-center justify-center text-primary font-bold text-xs">
+                          {fisherman.initials}
+                        </div>
+                      )}
                       <div>
                         <span className="font-medium text-primary">{fisherman.name}</span>
                         <span className="ml-2 text-xs px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">Active</span>
@@ -258,9 +263,13 @@ export default function FishermenList({ initialData }: { initialData: Fisherman[
             </div>
 
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 bg-primary/5 rounded-full flex items-center justify-center text-primary font-bold text-lg">
-                {fisherman.initials}
-              </div>
+              {fisherman.imageUrl ? (
+                <img src={fisherman.imageUrl} alt="" className="w-12 h-12 rounded-full object-cover" />
+              ) : (
+                <div className="w-12 h-12 bg-primary/5 rounded-full flex items-center justify-center text-primary font-bold text-lg">
+                  {fisherman.initials}
+                </div>
+              )}
               <div>
                 <h3 className="font-semibold text-primary">{fisherman.name}</h3>
                 <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-medium">Active</span>
@@ -283,7 +292,10 @@ export default function FishermenList({ initialData }: { initialData: Fisherman[
                 <p className="text-muted-foreground">Total Catch</p>
                 <p className="font-bold text-primary">{fisherman.totalWeight.toLocaleString()} kg</p>
               </div>
-              <button className="text-sm font-semibold text-primary hover:underline">
+              <button
+                onClick={() => router.push(`/fishermen/${fisherman.id}`)}
+                className="text-sm font-semibold text-primary hover:underline"
+              >
                 View Profile
               </button>
             </div>
