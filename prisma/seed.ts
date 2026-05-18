@@ -11,7 +11,7 @@ async function main() {
   console.log('🌱 Starting seed...');
 
   // 1. Create Roles
-  const roles = ['admin', 'staff'];
+  const roles = ['admin'];
   for (const roleName of roles) {
     await prisma.role.upsert({
       where: { name: roleName },

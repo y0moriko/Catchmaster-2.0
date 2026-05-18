@@ -93,7 +93,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm font-semibold text-primary">Trusted by Local Government</p>
-                  <p className="text-xs text-muted-foreground">Municipal administrators & staff</p>
+                  <p className="text-xs text-muted-foreground">Municipal administrator</p>
                 </div>
               </div>
             </div>
@@ -186,7 +186,7 @@ export default function LandingPage() {
               {
                 icon: Shield,
                 title: "Secure & Role-Based",
-                description: "Role-based access control ensures data security. Admin and staff roles with appropriate permissions.",
+                description: "Secure access control ensures data safety. Single-administrator setup tailored for Agdangan.",
                 color: "bg-red-50 text-red-600"
               },
               {

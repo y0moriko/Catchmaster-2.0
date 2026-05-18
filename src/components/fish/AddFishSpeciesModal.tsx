@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { Plus, X } from "lucide-react";
 import { createFishSpecies } from "@/lib/actions/fishSpecies";
 import ImageUpload from "@/components/ImageUpload";
+import { useToast } from "@/components/Toast";
 
 export default function AddFishSpeciesModal() {
   const [isOpen, setIsOpen] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
@@ -38,10 +40,13 @@ export default function AddFishSpeciesModal() {
     const result = await createFishSpecies(data);
 
     if (result.success) {
+      showToast("Fish species added successfully!", "success");
       setIsOpen(false);
       window.location.reload();
     } else {
-      setError(result.error || "Failed to create fish species");
+      const errorMsg = result.error || "Failed to create fish species";
+      setError(errorMsg);
+      showToast(errorMsg, "error");
     }
     setIsLoading(false);
   };

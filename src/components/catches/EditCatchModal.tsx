@@ -4,6 +4,7 @@ import { useState } from "react";
 import { X, Pencil } from "lucide-react";
 import { updateCatch } from "@/lib/actions/catch";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/Toast";
 
 interface CatchDetails {
   id: string;
@@ -45,6 +46,7 @@ export default function EditCatchModal({ catchRecord, fishermen, species, onClos
   species: FishSpecies[];
   onClose: () => void;
 }) {
+  const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
@@ -80,10 +82,13 @@ export default function EditCatchModal({ catchRecord, fishermen, species, onClos
     });
 
     if (result.success) {
+      showToast("Catch record updated successfully!", "success");
       onClose();
       router.refresh();
     } else {
-      setError(("error" in result && result.error) || "Failed to update catch record");
+      const errorMessage = ("error" in result && result.error) || "Failed to update catch record";
+      setError(errorMessage);
+      showToast(errorMessage, "error");
     }
     setIsLoading(false);
   };

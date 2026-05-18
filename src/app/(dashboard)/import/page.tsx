@@ -2,18 +2,19 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CloudUpload, FileSpreadsheet, CheckCircle, AlertCircle, Download } from "lucide-react";
+import { CloudUpload, CheckCircle, AlertCircle } from "lucide-react";
 import { batchImportCatches } from "@/lib/actions/intelligence";
 import { getFishermen } from "@/lib/actions/fisherman";
 import { getAllFishSpecies } from "@/lib/actions/catch";
+import { useToast } from "@/components/Toast";
 
 export default function ImportPage() {
   const router = useRouter();
+  const { showToast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<"upload" | "preview" | "done">("upload");
   const [preview, setPreview] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [result, setResult] = useState<{ count: number } | null>(null);
 
   const [fishermanMap, setFishermanMap] = useState<Record<string, string>>({});
@@ -49,7 +50,7 @@ export default function ImportPage() {
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setError("");
+    
     const reader = new FileReader();
     reader.onload = (ev) => {
       const text = ev.target?.result as string;
@@ -59,7 +60,7 @@ export default function ImportPage() {
         setPreview(data.slice(0, 10));
         setStep("preview");
       } catch (err: any) {
-        setError("Could not parse file. Please upload a valid CSV or Excel-exported JSON.");
+        showToast("Could not parse file. Please upload a valid CSV or Excel-exported JSON.", "error");
       }
     };
     reader.readAsText(file);
@@ -67,7 +68,6 @@ export default function ImportPage() {
 
   const handleImport = async () => {
     setLoading(true);
-    setError("");
     try {
       const unknownFishermen = new Set<string>();
       const unknownFish = new Set<string>();
@@ -95,7 +95,7 @@ export default function ImportPage() {
         const parts: string[] = [];
         if (unknownFishermen.size > 0) parts.push(`Unknown fishermen: ${[...unknownFishermen].join(", ")}`);
         if (unknownFish.size > 0) parts.push(`Unknown species: ${[...unknownFish].join(", ")}`);
-        setError(parts.join(". ") + ". Add them first in Fishermen or Fish Directory.");
+        showToast(parts.join(". ") + ". Add them first in Fishermen or Fish Directory.", "error");
         setLoading(false);
         return;
       }
@@ -103,11 +103,12 @@ export default function ImportPage() {
       if (res.success) {
         setResult({ count: res.count || 0 });
         setStep("done");
+        showToast("Import successful!", "success");
       } else {
-        setError(res.error || "Import failed");
+        showToast(res.error || "Import failed", "error");
       }
     } catch (err: any) {
-      setError(err.message || "Import failed");
+      showToast(err.message || "Import failed", "error");
     }
     setLoading(false);
   };
@@ -136,12 +137,6 @@ export default function ImportPage() {
             <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Expected Columns</p>
             <p className="text-xs text-slate-600 font-mono">Fisherman, Date, Location, Species, Quantity, Weight, Weather</p>
           </div>
-
-          {error && (
-            <div className="mt-4 flex items-center gap-2 text-red-600 text-sm">
-              <AlertCircle className="w-4 h-4" /> {error}
-            </div>
-          )}
         </div>
       )}
 
@@ -171,7 +166,6 @@ export default function ImportPage() {
               </tbody>
             </table>
           </div>
-          {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
           <button
             onClick={handleImport}
             disabled={loading}

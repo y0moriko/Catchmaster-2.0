@@ -4,6 +4,7 @@ import { useState } from "react";
 import { X, FileText, CheckCircle2, Sparkles } from "lucide-react";
 import { createManyFishSpecies } from "@/lib/actions/fishSpecies";
 import { parseFishDataWithAI } from "@/lib/actions/fishSpecies";
+import { useToast } from "@/components/Toast";
 
 interface FishPreview {
   name: string;
@@ -17,6 +18,7 @@ interface FishPreview {
 }
 
 export default function ImportPDFFishModal() {
+  const { showToast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -38,11 +40,15 @@ export default function ImportPDFFishModal() {
       if (result.success && result.data) {
         setPreview(result.data as FishPreview[]);
       } else {
-        setError(result.error || "Failed to parse data with AI");
+        const errorMessage = result.error || "Failed to parse data with AI";
+        setError(errorMessage);
+        showToast(errorMessage, "error");
         setPreview([]);
       }
     } catch (err) {
-      setError("Failed to parse: " + (err instanceof Error ? err.message : String(err)));
+      const errorMessage = "Failed to parse: " + (err instanceof Error ? err.message : String(err));
+      setError(errorMessage);
+      showToast(errorMessage, "error");
       setPreview([]);
     }
     setAiProcessing(false);
@@ -57,11 +63,14 @@ export default function ImportPDFFishModal() {
     const result = await createManyFishSpecies(preview);
 
     if (result.success) {
+      showToast("Species imported successfully!", "success");
       setIsOpen(false);
       setPreview([]);
       window.location.reload();
     } else {
-      setError(result.error || "Failed to import fish species");
+      const errorMessage = result.error || "Failed to import fish species";
+      setError(errorMessage);
+      showToast(errorMessage, "error");
     }
     setIsLoading(false);
   };

@@ -2,8 +2,10 @@
 
 import React, { useState } from "react";
 import { Users, UserPlus, Search, MoreVertical, ShieldCheck, MapPin, Phone, Trash2 } from "lucide-react";
+import { useToast } from "@/components/Toast";
 
 export default function DemoFishermen() {
+  const { showToast } = useToast();
   const [fishermen, setFishermen] = useState([
     { id: "1", name: "Juan Dela Cruz", barangay: "Poblacion", contact: "0912-345-6789", totalWeight: 245.5, status: "Active" },
     { id: "2", name: "Pedro Santos", barangay: "Ilayang Polo", contact: "0923-456-7890", totalWeight: 189.0, status: "Active" },
@@ -32,8 +34,7 @@ export default function DemoFishermen() {
     setNewName("");
     setIsAdding(false);
     
-    // Show a presentation-style notification (simulated)
-    alert(`Success: ${newName} has been added to the registry!`);
+    showToast(`Success: ${newName} has been added to the registry!`, "success");
   };
 
   return (

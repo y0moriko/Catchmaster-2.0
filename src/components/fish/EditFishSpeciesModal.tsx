@@ -5,6 +5,7 @@ import { X, Pencil } from "lucide-react";
 import { updateFishSpecies } from "@/lib/actions/fishSpecies";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/ImageUpload";
+import { useToast } from "@/components/Toast";
 
 interface FishSpecies {
   id: string;
@@ -21,6 +22,7 @@ interface FishSpecies {
 }
 
 export default function EditFishSpeciesModal({ fish, onClose }: { fish: FishSpecies; onClose: () => void }) {
+  const { showToast } = useToast();
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = ""; };
@@ -58,10 +60,13 @@ export default function EditFishSpeciesModal({ fish, onClose }: { fish: FishSpec
     });
 
     if (result.success) {
+      showToast("Species updated successfully!", "success");
       onClose();
       router.refresh();
     } else {
-      setError(("error" in result && result.error) || "Failed to update fish species");
+      const errorMessage = ("error" in result && result.error) || "Failed to update fish species";
+      setError(errorMessage);
+      showToast(errorMessage, "error");
     }
     setIsLoading(false);
   };

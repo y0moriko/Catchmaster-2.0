@@ -2,8 +2,10 @@
 
 import React, { useState } from "react";
 import { BarChart3, TrendingUp, Fish, Download, Filter, Calendar, FileText, PieChart } from "lucide-react";
+import { useToast } from "@/components/Toast";
 
 export default function DemoReports() {
+  const { showToast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
   const [reportType, setReportType] = useState("Monthly Production");
 
@@ -11,7 +13,7 @@ export default function DemoReports() {
     setIsGenerating(true);
     setTimeout(() => {
       setIsGenerating(false);
-      alert(`Report "${reportType}" has been generated and is ready for download!`);
+      showToast(`Report "${reportType}" has been generated and is ready for download!`, "success");
     }, 2000);
   };
 

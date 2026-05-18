@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { Plus, X } from "lucide-react";
 import { createFisherman } from "@/lib/actions/fisherman";
 import ImageUpload from "@/components/ImageUpload";
+import { useToast } from "@/components/Toast";
 
 export default function AddFishermanModal() {
   const [isOpen, setIsOpen] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
@@ -35,10 +37,13 @@ export default function AddFishermanModal() {
     const result = await createFisherman(data);
 
     if (result.success) {
+      showToast("Fisherman added successfully!", "success");
       setIsOpen(false);
-      // Success handling (maybe a toast)
+      setImageUrl(null);
     } else {
-      setError(result.error || "Failed to create fisherman");
+      const errorMsg = result.error || "Failed to create fisherman";
+      setError(errorMsg);
+      showToast(errorMsg, "error");
     }
     setIsLoading(false);
   };
