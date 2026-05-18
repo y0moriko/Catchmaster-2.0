@@ -27,6 +27,7 @@ export default function CatchLoggingForm({
 }) {
   const [fishermanId, setFishermanId] = useState("");
   const [location, setLocation] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 16));
   const [entries, setEntries] = useState([{ fishId: "", quantity: 1, weight: 0 }]);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -60,6 +61,7 @@ export default function CatchLoggingForm({
     const result = await createCatch({
       fishermanId,
       recordedBy: userId,
+      date: new Date(date),
       location,
       details: validEntries
     });
@@ -86,6 +88,7 @@ export default function CatchLoggingForm({
             setEntries([{ fishId: "", quantity: 1, weight: 0 }]); 
             setFishermanId(""); 
             setLocation("");
+            setDate(new Date().toISOString().slice(0, 16));
           }}
           className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-slate-700 transition-colors"
         >
@@ -101,7 +104,7 @@ export default function CatchLoggingForm({
       <div className="bg-white p-6 rounded-2xl border border-border shadow-sm space-y-4">
         <div className="flex items-center gap-2 text-primary">
           <User className="w-5 h-5" />
-          <h2 className="font-bold">1. Select Fisherman</h2>
+          <h2 className="font-bold">1. Trip Details</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -119,6 +122,16 @@ export default function CatchLoggingForm({
             </select>
           </div>
           <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700">Catch Date & Time</label>
+            <input 
+              type="datetime-local"
+              required
+              className="w-full px-4 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary outline-none transition-all bg-white"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
             <label className="text-sm font-medium text-slate-700">Landing Location (Optional)</label>
             <div className="relative">
               <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />

@@ -94,8 +94,7 @@ export default function DemoCatches() {
                     <input 
                       type="date" 
                       defaultValue={new Date().toISOString().split('T')[0]}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 font-medium text-slate-500" 
-                      disabled
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none bg-white font-medium" 
                     />
                   </div>
                 </div>
@@ -106,9 +105,8 @@ export default function DemoCatches() {
                     Landing Location
                   </label>
                   <input 
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 font-medium text-slate-500" 
-                    value="Agdangan Municipal Port - Sector A"
-                    disabled
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none bg-white font-medium" 
+                    defaultValue="Agdangan Municipal Port - Sector A"
                   />
                 </div>
 

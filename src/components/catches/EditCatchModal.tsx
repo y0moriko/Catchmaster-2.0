@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Pencil } from "lucide-react";
+import { X, Pencil, Calendar } from "lucide-react";
 import { updateCatch } from "@/lib/actions/catch";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/Toast";
@@ -20,6 +20,7 @@ interface CatchDetails {
 
 interface CatchRecord {
   id: string;
+  date: Date | string;
   fishermanId: string;
   location: string | null;
   weatherCondition: string | null;
@@ -51,6 +52,7 @@ export default function EditCatchModal({ catchRecord, fishermen, species, onClos
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     fishermanId: catchRecord.fishermanId,
+    date: new Date(catchRecord.date).toISOString().slice(0, 16),
     location: catchRecord.location || "",
     weatherCondition: catchRecord.weatherCondition || "",
     temperature: catchRecord.temperature?.toString() || "",
@@ -73,6 +75,7 @@ export default function EditCatchModal({ catchRecord, fishermen, species, onClos
 
     const result = await updateCatch(catchRecord.id, {
       fishermanId: formData.fishermanId,
+      date: new Date(formData.date),
       location: formData.location || undefined,
       weatherCondition: formData.weatherCondition || undefined,
       temperature: formData.temperature ? parseFloat(formData.temperature) : undefined,
@@ -124,18 +127,33 @@ export default function EditCatchModal({ catchRecord, fishermen, species, onClos
             </div>
           )}
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Fisherman</label>
-            <select
-              required
-              className="w-full px-4 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary outline-none transition-all bg-white"
-              value={formData.fishermanId}
-              onChange={(e) => setFormData({ ...formData, fishermanId: e.target.value })}
-            >
-              {fishermen.map((f) => (
-                <option key={f.id} value={f.id}>{f.name}</option>
-              ))}
-            </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Fisherman</label>
+              <select
+                required
+                className="w-full px-4 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary outline-none transition-all bg-white"
+                value={formData.fishermanId}
+                onChange={(e) => setFormData({ ...formData, fishermanId: e.target.value })}
+              >
+                {fishermen.map((f) => (
+                  <option key={f.id} value={f.id}>{f.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Catch Date & Time</label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <input
+                  type="datetime-local"
+                  required
+                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary outline-none transition-all bg-white"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                />
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

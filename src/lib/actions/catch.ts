@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 const createCatchSchema = z.object({
   fishermanId: z.string().min(1, "Fisherman is required"),
   recordedBy: z.string().min(1, "Recorder ID is required"),
+  date: z.date().optional(),
   location: z.string().optional(),
   weatherCondition: z.string().optional(),
   temperature: z.number().positive().optional(),
@@ -100,6 +101,7 @@ export async function getCatchById(id: string) {
 export async function createCatch(data: {
   fishermanId: string;
   recordedBy: string;
+  date?: Date;
   location?: string;
   weatherCondition?: string;
   temperature?: number;
@@ -119,6 +121,7 @@ export async function createCatch(data: {
         data: {
           fishermanId: validated.fishermanId,
           recordedBy: validated.recordedBy,
+          date: validated.date || new Date(),
           location: validated.location,
           weatherCondition: validated.weatherCondition,
           temperature: validated.temperature,
@@ -151,6 +154,7 @@ export async function createCatch(data: {
 
 export async function updateCatch(id: string, data: {
   fishermanId?: string;
+  date?: Date;
   location?: string;
   weatherCondition?: string;
   temperature?: number;
@@ -174,6 +178,7 @@ export async function updateCatch(id: string, data: {
         where: { id },
         data: {
           ...(data.fishermanId && { fishermanId: data.fishermanId }),
+          ...(data.date && { date: data.date }),
           ...(data.location !== undefined && { location: data.location }),
           ...(data.weatherCondition !== undefined && { weatherCondition: data.weatherCondition }),
           ...(data.temperature !== undefined && { temperature: data.temperature }),
