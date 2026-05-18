@@ -65,7 +65,11 @@ export default function SignupPage() {
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-primary overflow-hidden">
       <div className="absolute inset-0 z-0 opacity-40">
-        <div className="w-full h-full bg-[url('/background.png')] bg-cover bg-center" />
+        <img 
+          src="/background.png" 
+          alt="" 
+          className="w-full h-full object-cover"
+        />
       </div>
 
       <div className="relative z-10 w-full max-lg p-8 bg-white rounded-2xl shadow-2xl mx-4 my-8">
