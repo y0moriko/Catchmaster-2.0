@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
 import {
   LayoutDashboard,
   Users,
@@ -23,9 +22,6 @@ import { useState } from "react";
 export function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { data: session } = useSession();
-  const userRole = (session?.user as { role?: string })?.role || "staff";
-
   const sections = [
     {
       label: "Overview",
@@ -55,10 +51,7 @@ export function Sidebar() {
         { icon: Eye, label: "Public Dashboard", href: "/public" },
       ],
     },
-  ].map(section => ({
-    ...section,
-    items: section.items.filter(item => !(item as { adminOnly?: boolean }).adminOnly || userRole === "admin"),
-  })).filter(section => section.items.length > 0);
+  ];
 
   return (
     <>

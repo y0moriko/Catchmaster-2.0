@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Anchor, Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useEffect } from "react";
+import { useToast } from "@/components/Toast";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,6 +15,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { showToast } = useToast();
 
   // Demo mode removed - use proper credentials
 
@@ -30,22 +32,31 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        const errorMsg = "Invalid email or password";
+        setError(errorMsg);
+        showToast(errorMsg, "error");
         setLoading(false);
       } else {
+        showToast("Login successful! Welcome back.", "success");
         router.push("/dashboard");
         router.refresh();
       }
     } catch {
-      setError("An unexpected error occurred");
+      const errorMsg = "An unexpected error occurred";
+      setError(errorMsg);
+      showToast(errorMsg, "error");
       setLoading(false);
     }
   };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-primary overflow-hidden">
-      <div className="absolute inset-0 z-0 opacity-20">
-        <div className="w-full h-full bg-[url('https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80')] bg-cover bg-center grayscale" />
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/background.png" 
+          alt="" 
+          className="w-full h-full object-cover opacity-20"
+        />
       </div>
 
       <div className="relative z-10 w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl mx-4">

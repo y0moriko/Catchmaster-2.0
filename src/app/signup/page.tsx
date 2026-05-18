@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Anchor } from "lucide-react";
+import { useToast } from "@/components/Toast";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { showToast } = useToast();
 
   useEffect(() => {
     // Clear hardcoded invite code from client - server will validate
@@ -28,7 +30,9 @@ export default function SignupPage() {
 
     // Basic client-side check - server validates properly
     if (!formData.inviteCode) {
-      setError("Administrative invite code is required");
+      const errorMsg = "Administrative invite code is required";
+      setError(errorMsg);
+      showToast(errorMsg, "error");
       setLoading(false);
       return;
     }
@@ -41,13 +45,18 @@ export default function SignupPage() {
       });
 
       if (res.ok) {
+        showToast("Registration successful! You can now sign in.", "success");
         router.push("/login?registered=true");
       } else {
         const data = await res.json();
-        setError(data.message || "Registration failed");
+        const errorMsg = data.message || "Registration failed";
+        setError(errorMsg);
+        showToast(errorMsg, "error");
       }
     } catch {
-      setError("An unexpected error occurred");
+      const errorMsg = "An unexpected error occurred";
+      setError(errorMsg);
+      showToast(errorMsg, "error");
     } finally {
       setLoading(false);
     }
@@ -55,11 +64,15 @@ export default function SignupPage() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-primary overflow-hidden">
-      <div className="absolute inset-0 z-0 opacity-20">
-        <div className="w-full h-full bg-[url('https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80')] bg-cover bg-center grayscale" />
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/background.png" 
+          alt="" 
+          className="w-full h-full object-cover opacity-20"
+        />
       </div>
 
-      <div className="relative z-10 w-full max-w-lg p-8 bg-white rounded-2xl shadow-2xl mx-4 my-8">
+      <div className="relative z-10 w-full max-lg p-8 bg-white rounded-2xl shadow-2xl mx-4 my-8">
         <div className="flex flex-col items-center mb-6">
           <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-3 shadow-inner">
             <Anchor className="text-white w-8 h-8" />

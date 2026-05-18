@@ -5,6 +5,7 @@ import { X, Pencil } from "lucide-react";
 import { updateFisherman, getFishermanById } from "@/lib/actions/fisherman";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/ImageUpload";
+import { useToast } from "@/components/Toast";
 
 interface Fisherman {
   id: string;
@@ -33,6 +34,7 @@ export default function EditFishermanModal({ fisherman, onClose }: { fisherman: 
     contactNumber: fisherman.contactNumber,
   });
   const router = useRouter();
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,10 +44,13 @@ export default function EditFishermanModal({ fisherman, onClose }: { fisherman: 
     const result = await updateFisherman(fisherman.id, { ...formData, imageUrl: imageUrl || undefined });
 
     if (result.success) {
+      showToast("Fisherman updated successfully!", "success");
       onClose();
       router.refresh();
     } else {
-      setError(("error" in result && result.error) || "Failed to update fisherman");
+      const errorMsg = ("error" in result && result.error) || "Failed to update fisherman";
+      setError(errorMsg);
+      showToast(errorMsg, "error");
     }
     setIsLoading(false);
   };
