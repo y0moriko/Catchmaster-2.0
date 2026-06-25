@@ -52,19 +52,19 @@ Report Page Overview	33
 One-Click Reports	33
 Quick Analytics	34
 Advanced Analytics-Monthly Trends	34
-Catch Forecasting	35
-Forecast Overview	35
-Summary Cards	35
-Forecast Chart	36
-Species-Level Forecast	36
-Batch Data Import	37
-Import Page Overview	37
-Uploading and Previewing Data	38
-Public Dashboard	39
-Public Dashboard Overview	39
-Sharing Read-Only Data	39
-Admin Profile	40
-Profile Overview	40
+Batch Data Import	35
+Import Page Overview	35
+Uploading and Previewing Data	36
+Catch Forecasting	37
+Forecast Overview	37
+Summary Cards	37
+Forecast Chart	38
+Species-Level Forecast	39
+Public Dashboard	40
+Public Dashboard Overview	40
+Sharing Read-Only Data	40
+Admin Profile	41
+Profile Overview	41
  
 OVERVIEW
 
@@ -778,93 +778,6 @@ Figure 61: Year selector
 2. The Monthly Trends chart displays horizontal bars for each month.
 3. Each bar's width is proportional to the catch weight, with the exact value displayed.
 
-CATCH FORECASTING
-
-Forecast Overview
-
-The Catch Forecasting page provides predictive analytics for future catch volumes using statistical models. The system analyzes historical catch data to generate forecasts for the next 6 months.
-
-Breadcrumb navigation: Sidebar > Forecast
-
-**IMAGE PLACEHOLDER: Catch Forecasting page**
-*Figure 62: Catch Forecasting page overview*
-
-The Forecasting page includes the following sections:
-	Summary Cards — Four key prediction metrics
-	Historical & Forecast Trend Chart — Combined line chart of actual and projected catch
-	Species-Level Forecast — Table of predicted catch by species
-	Methodology Note — Explanation of how forecasts are calculated
-
-Requirements:
-- A minimum of 3 months of catch data is required to generate a forecast.
-- Forecast accuracy improves with more historical data (12+ months for high confidence).
-
-Summary Cards
-
-The top of the Forecasting page displays four summary cards:
-
-Card	Description
-Next Month	Predicted total catch weight for the upcoming month
-Next Quarter	Predicted total catch weight for the next 3 months combined
-Confidence	Forecast confidence level (Low, Medium, or High)
-Overall Trend	Direction of the predicted trend (Increasing, Decreasing, or Stable)
-
-Each card includes:
-- The predicted value with trend indicator (up/down/stable arrow)
-- Percentage change compared to recent average
-- Confidence level explanation (e.g., "Based on 12+ months of data")
-
-**IMAGE PLACEHOLDER: Summary cards on the forecast page**
-*Figure 63: Forecast summary cards*
-
-Forecast Chart
-
-The Historical & Forecast Trend Chart visualizes catch data over time.
-
-**IMAGE PLACEHOLDER: Forecast line chart**
-*Figure 64: Historical & Forecast trend chart*
-
-Chart elements:
-	Solid line — Actual historical catch data (last 12 months)
-	Dashed line — Predicted future catch (next 6 months)
-	Shaded area — Confidence interval (forecast uncertainty range)
-	X-axis — Time (months)
-	Y-axis — Catch weight (kg)
-
-The confidence interval widens for longer projections, reflecting increased uncertainty for predictions further into the future.
-
-Species-Level Forecast
-
-Below the chart, the Species-Level Forecast table shows predicted trends for individual fish species.
-
-**IMAGE PLACEHOLDER: Species forecast table**
-*Figure 65: Species-Level Forecast table*
-
-Table columns:
-Column	Description
-Species	Name and local name of the fish species
-Current Avg (kg/mo)	Average monthly catch weight over the past 12 months
-Predicted Next (kg)	Predicted catch weight for the next month
-Trend	Predicted direction: Up, Down, or Stable
-
-Species are ranked by predicted catch volume, helping identify which species are expected to increase or decline.
-
-Methodology
-
-The forecast is generated using a blended statistical approach:
-
-1. Moving Averages — 3-month and 6-month rolling averages smooth out short-term fluctuations
-2. Linear Regression — A trend line is calculated from all historical data points
-3. Seasonal Adjustment — Monthly patterns are identified by comparing each month against the annual average
-4. Weighted Blend — The final prediction combines regression (40%) and smoothed averages (60%), multiplied by the seasonal factor
-
-Formula:
-```
-Forecast = (Regression × 0.4 + Smoothed Average × 0.6) × Seasonal Factor
-```
-
-> Note: This is a statistical estimate and should be used alongside local knowledge and expert judgment for decision-making.
-
 BATCH DATA IMPORT
 
 Import Page Overview
@@ -904,15 +817,94 @@ Weight	Weight in kilograms	45.5
 Weather	Weather condition	Sunny
 
 5. Once the file is loaded, a Preview will show the first 10 records.
-
 6. Review the data for accuracy.
 
+CATCH FORECASTING
 
+Forecast Overview
 
+The Catch Forecasting page provides predictive analytics for future catch volumes using statistical models. The system analyzes historical catch data to generate forecasts for the next 6 months.
 
+Breadcrumb navigation: Sidebar > Forecast
 
+**IMAGE PLACEHOLDER: Catch Forecasting page**
+*Figure 65: Catch Forecasting page overview*
 
+The Forecasting page includes the following sections:
+	Summary Cards — Four key prediction metrics
+	Historical & Forecast Trend Chart — Combined line chart of actual and projected catch
+	Species-Level Forecast — Table of predicted catch by species
+	Methodology Note — Explanation of how forecasts are calculated
 
+Requirements:
+- A minimum of 3 months of catch data is required to generate a forecast.
+- Forecast accuracy improves with more historical data (12+ months for high confidence).
+
+Summary Cards
+
+The top of the Forecasting page displays four summary cards:
+
+Card	Description
+Next Month	Predicted total catch weight for the upcoming month
+Next Quarter	Predicted total catch weight for the next 3 months combined
+Confidence	Forecast confidence level (Low, Medium, or High)
+Overall Trend	Direction of the predicted trend (Increasing, Decreasing, or Stable)
+
+Each card includes:
+- The predicted value with trend indicator (up/down/stable arrow)
+- Percentage change compared to recent average
+- Confidence level explanation (e.g., "Based on 12+ months of data")
+
+**IMAGE PLACEHOLDER: Summary cards on the forecast page**
+*Figure 66: Forecast summary cards*
+
+Forecast Chart
+
+The Historical & Forecast Trend Chart visualizes catch data over time.
+
+**IMAGE PLACEHOLDER: Forecast line chart**
+*Figure 67: Historical & Forecast trend chart*
+
+Chart elements:
+	Solid line — Actual historical catch data (last 12 months)
+	Dashed line — Predicted future catch (next 6 months)
+	Shaded area — Confidence interval (forecast uncertainty range)
+	X-axis — Time (months)
+	Y-axis — Catch weight (kg)
+
+The confidence interval widens for longer projections, reflecting increased uncertainty for predictions further into the future.
+
+Species-Level Forecast
+
+Below the chart, the Species-Level Forecast table shows predicted trends for individual fish species.
+
+**IMAGE PLACEHOLDER: Species forecast table**
+*Figure 68: Species-Level Forecast table*
+
+Table columns:
+Column	Description
+Species	Name and local name of the fish species
+Current Avg (kg/mo)	Average monthly catch weight over the past 12 months
+Predicted Next (kg)	Predicted catch weight for the next month
+Trend	Predicted direction: Up, Down, or Stable
+
+Species are ranked by predicted catch volume, helping identify which species are expected to increase or decline.
+
+Methodology
+
+The forecast is generated using a blended statistical approach:
+
+1. Moving Averages — 3-month and 6-month rolling averages smooth out short-term fluctuations
+2. Linear Regression — A trend line is calculated from all historical data points
+3. Seasonal Adjustment — Monthly patterns are identified by comparing each month against the annual average
+4. Weighted Blend — The final prediction combines regression (40%) and smoothed averages (60%), multiplied by the seasonal factor
+
+Formula:
+```
+Forecast = (Regression × 0.4 + Smoothed Average × 0.6) × Seasonal Factor
+```
+
+> Note: This is a statistical estimate and should be used alongside local knowledge and expert judgment for decision-making.
 
 PUBLIC DASHBOARD
 
@@ -920,7 +912,7 @@ Public Dashboard Overview
 The Public Dashboard Overview page provides a shareable read-only view of catch summaries for stakeholders.
 
  
-Figure 65: Public Dashboard page
+Figure 69: Public Dashboard page
 
 Breadcrumb navigation: Sidebar > Public Dashboard
 Page elements:
@@ -931,14 +923,14 @@ Page elements:
 Sharing Read-Only Data
 1. On the Public Dashboard page, locate the Shareable Link section.
  
-Figure 66: Shareable link with copy button
+Figure 70: Shareable link with copy button
 
 2. Click "Copy" to copy the public URL to your clipboard.
 3. Share the link with the Mayor's office, Planning Department, or other stakeholders.
 4. The public view displays:
     
 
-Figure 67: Public View page
+Figure 71: Public View page
 
   Total Catch — Aggregate weight in kilograms
   Active Fishermen — Total registered fisherfolk
@@ -953,7 +945,7 @@ Profile Overview
 Your profile information is displayed in the top-right header of the dashboard.
 
  
-Figure 68: Header bar with user profile
+Figure 72: Header bar with user profile
 
 The header displays:
 User name — Your full name
