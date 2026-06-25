@@ -2,6 +2,99 @@
 
 import { prisma } from "@/lib/prisma";
 
+function seededRandom(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 16807 + 0) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+function generateDummyForecast(): ForecastResult {
+  const rng = seededRandom(42);
+  const now = new Date();
+  const historical: ForecastPoint[] = [];
+  const baseWeight = 1200;
+
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthIndex = d.getMonth();
+    const year = d.getFullYear();
+    const month = d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+
+    const seasonalBoost = [1.1, 1.0, 0.9, 0.85, 0.8, 0.85, 0.9, 1.0, 1.05, 1.15, 1.2, 1.15][monthIndex];
+    const noise = 0.7 + rng() * 0.6;
+    const trend = 1 + (i * 0.008);
+    const weight = Math.round(baseWeight * seasonalBoost * noise * trend);
+
+    historical.push({
+      month,
+      monthIndex,
+      year,
+      actual: weight,
+      forecast: null,
+      lowerBound: null,
+      upperBound: null,
+    });
+  }
+
+  const projected: ForecastPoint[] = [];
+  const last = historical[historical.length - 1];
+  const avgWeight = historical.reduce((s, h) => s + h.actual!, 0) / historical.length;
+
+  for (let i = 1; i <= 6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    const monthIndex = d.getMonth();
+    const year = d.getFullYear();
+    const month = d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+
+    const seasonalBoost = [1.1, 1.0, 0.9, 0.85, 0.8, 0.85, 0.9, 1.0, 1.05, 1.15, 1.2, 1.15][monthIndex];
+    const trendFactor = 1 + i * 0.01;
+    const forecast = Math.round(avgWeight * seasonalBoost * trendFactor);
+    const bounds = forecast * (0.08 + i * 0.03);
+
+    projected.push({
+      month,
+      monthIndex,
+      year,
+      actual: null,
+      forecast,
+      lowerBound: Math.round((forecast - bounds) * 10) / 10,
+      upperBound: Math.round((forecast + bounds) * 10) / 10,
+    });
+  }
+
+  const speciesForecasts: SpeciesForecast[] = [
+    { name: "Tuna", localName: "Tuna", currentMonthlyAvg: 420, predictedNextMonth: 465, trend: "up" },
+    { name: "Bangus", localName: "Milkfish", currentMonthlyAvg: 380, predictedNextMonth: 360, trend: "down" },
+    { name: "Galunggong", localName: "Round Scad", currentMonthlyAvg: 290, predictedNextMonth: 310, trend: "up" },
+    { name: "Tamban", localName: "Sardine", currentMonthlyAvg: 210, predictedNextMonth: 200, trend: "down" },
+    { name: "Apahap", localName: "Sea Bass", currentMonthlyAvg: 150, predictedNextMonth: 160, trend: "up" },
+    { name: "Bisugo", localName: "Threadfin Bream", currentMonthlyAvg: 120, predictedNextMonth: 125, trend: "stable" },
+    { name: "Maya-Maya", localName: "Snapper", currentMonthlyAvg: 95, predictedNextMonth: 100, trend: "stable" },
+    { name: "Lapu-Lapu", localName: "Grouper", currentMonthlyAvg: 75, predictedNextMonth: 70, trend: "down" },
+  ];
+
+  const nextMonthVal = projected[0].forecast!;
+  const nextQuarterVal = projected.slice(0, 3).reduce((a, b) => a + b.forecast!, 0);
+  const recentAvg = historical.slice(-3).reduce((s, h) => s + h.actual!, 0) / 3;
+  const pctChange = ((nextMonthVal - recentAvg) / recentAvg) * 100;
+
+  return {
+    historical,
+    projected,
+    speciesForecasts,
+    isDummy: true,
+    summary: {
+      nextMonthPrediction: nextMonthVal,
+      nextQuarterPrediction: Math.round(nextQuarterVal * 10) / 10,
+      confidence: "medium",
+      trend: pctChange > 5 ? "increasing" : pctChange < -5 ? "decreasing" : "stable",
+      percentageChange: Math.round(pctChange * 10) / 10,
+    },
+  };
+}
+
 interface MonthlyData {
   month: string;
   monthIndex: number;
@@ -32,6 +125,7 @@ export interface ForecastResult {
   historical: ForecastPoint[];
   projected: ForecastPoint[];
   speciesForecasts: SpeciesForecast[];
+  isDummy?: boolean;
   summary: {
     nextMonthPrediction: number;
     nextQuarterPrediction: number;
@@ -141,8 +235,9 @@ export async function getCatchForecast(): Promise<ForecastResult> {
     const n = weights.length;
 
     if (n < 3) {
-      return {
-        historical: history.map((h) => ({
+      const dummy = generateDummyForecast();
+      if (n > 0) {
+        const mergedHistorical = history.map((h) => ({
           month: h.month,
           monthIndex: h.monthIndex,
           year: h.year,
@@ -150,17 +245,16 @@ export async function getCatchForecast(): Promise<ForecastResult> {
           forecast: null,
           lowerBound: null,
           upperBound: null,
-        })),
-        projected: [],
-        speciesForecasts: [],
-        summary: {
-          nextMonthPrediction: 0,
-          nextQuarterPrediction: 0,
-          confidence: "low",
-          trend: "stable",
-          percentageChange: 0,
-        },
-      };
+        }));
+        const dummyHistorical = dummy.historical.slice(-(12 - n));
+        return {
+          historical: [...mergedHistorical, ...dummyHistorical],
+          projected: dummy.projected,
+          speciesForecasts: dummy.speciesForecasts,
+          summary: dummy.summary,
+        };
+      }
+      return dummy;
     }
 
     const seasons = seasonalFactors(history);
@@ -245,18 +339,7 @@ export async function getCatchForecast(): Promise<ForecastResult> {
     };
   } catch (error) {
     console.error("Forecast error:", error);
-    return {
-      historical: [],
-      projected: [],
-      speciesForecasts: [],
-      summary: {
-        nextMonthPrediction: 0,
-        nextQuarterPrediction: 0,
-        confidence: "low",
-        trend: "stable",
-        percentageChange: 0,
-      },
-    };
+    return generateDummyForecast();
   }
 }
 

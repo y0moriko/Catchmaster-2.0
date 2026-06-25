@@ -51,7 +51,7 @@ export default function ForecastPage() {
     );
   }
 
-  if (!data || data.historical.length === 0) {
+  if (!data) {
     return (
       <div className="space-y-8">
         <div>
@@ -60,10 +60,9 @@ export default function ForecastPage() {
         </div>
         <div className="bg-white border border-border rounded-2xl p-12 shadow-sm text-center">
           <Calendar className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-primary mb-2">Insufficient Data</h3>
+          <h3 className="text-xl font-bold text-primary mb-2">Unable to Load Forecast</h3>
           <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            At least 3 months of catch data are needed to generate a forecast.
-            Start logging catches to enable predictions.
+            Could not generate forecast data. Please try again later.
           </p>
         </div>
       </div>
@@ -91,11 +90,19 @@ export default function ForecastPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-primary">Catch Forecasting</h1>
-        <p className="text-muted-foreground">
-          Predictive analysis based on historical catch data
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-primary">Catch Forecasting</h1>
+          <p className="text-muted-foreground">
+            Predictive analysis based on historical catch data
+          </p>
+        </div>
+        {data.isDummy && (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
+            <Calendar className="w-3.5 h-3.5" />
+            Sample Data
+          </span>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -145,11 +152,13 @@ export default function ForecastPage() {
           </p>
           <p className="text-2xl font-bold text-primary capitalize">{summary.confidence}</p>
           <p className="text-xs text-slate-400 mt-1">
-            {summary.confidence === "high"
-              ? "Based on 12+ months of data"
-              : summary.confidence === "medium"
-                ? "Based on 6+ months of data"
-                : "Limited historical data"}
+            {data.isDummy
+              ? "Estimated — sample data shown"
+              : summary.confidence === "high"
+                ? "Based on 12+ months of data"
+                : summary.confidence === "medium"
+                  ? "Based on 6+ months of data"
+                  : "Limited historical data"}
           </p>
         </div>
 
