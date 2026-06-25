@@ -13,7 +13,8 @@ import {
   X,
   FileText,
   Zap,
-  Eye
+  Eye,
+  TrendingUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
@@ -48,6 +49,7 @@ export function Sidebar() {
       items: [
         { icon: BarChart3, label: "Reports", href: "/reports" },
         { icon: BarChart3, label: "Analytics", href: "/analytics" },
+        { icon: TrendingUp, label: "Forecast", href: "/forecast" },
         { icon: Eye, label: "Public Dashboard", href: "/public" },
       ],
     },
